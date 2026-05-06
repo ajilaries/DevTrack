@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Django stuff
+*.log
+db.sqlite3
+db.sqlite3-journal
+
+# Media & static files (optional depending on setup)
+media/
+staticfiles/
+
+# Environment variables
+.env
+
+# VS Code / IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Migrations (optional - usually keep them, but ignore if needed)
+# */migrations/*
+# !*/migrations/__init__.py
+
+# Python packaging
+*.egg-info/
+dist/
+build/
+
+# Cache
+.cache/
