@@ -2,39 +2,58 @@ from django.shortcuts import render, redirect,get_object_or_404
 from .models import StudyLog
 from .forms import StudyLogForm
 from django.contrib.auth import login,authenticate, logout
+from django.contrib.auth.decorators import login_required
 from .forms import SignupForm
 
 
 # signup
 def signup_view(request):
-    if request.method=="POST":
-        form=SignupForm(request.POST)
-        if form.is_valid():
-            user=form.save()
-            login(request,user)
-            return redirect('dashboard')
-        else:
-            form=SignupForm()
 
-        return render(request, 'tracker/signup.html',{'form':form})
+    if request.method == "POST":
+
+        form = SignupForm(request.POST)
+
+        if form.is_valid():
+            user = form.save()
+
+            # Auto login after signup
+            login(request, user)
+
+            return redirect('dashboard')
+
+    else:
+        form = SignupForm()
+
+    # IMPORTANT 👇
+    return render(request, 'tracker/signup.html', {
+        'form': form
+    })
 
 # login
 def login_view(request):
-    if request.method=="POST":
-        username=request.POST.get('username')
-        password=request.POST.get('password')
 
-        user=authenticate(request,username=username, password=password)
+    if request.method == "POST":
+
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(
+            request,
+            username=username,
+            password=password
+        )
 
         if user is not None:
-            login(request,user)
+            login(request, user)
             return redirect('dashboard')
-        else:
-            return render(request,'tracker/login.html',{
-                'error':'Invalid credentials'
-            })
-        return render(request, 'tracker/login.html')
 
+        else:
+            return render(request, 'tracker/login.html', {
+                'error': 'Invalid username or password'
+            })
+
+    # IMPORTANT 👇
+    return render(request, 'tracker/login.html')
 def logout_view(request):
     logout(request)
     return redirect('landing')
@@ -47,6 +66,26 @@ def home(request):
     return render(request, 'tracker/home.html', {'logs': logs})
 
 
+@login_required
+def dashboard(request):
+
+    logs = StudyLog.objects.filter(user=request.user)
+
+    total_hours = 0
+
+    for log in logs:
+        total_hours += log.hours
+
+    context = {
+        'logs': logs,
+        'total_hours': total_hours
+    }
+
+    return render(
+        request,
+        'tracker/dashboard.html',
+        context
+    )
 def add_log(request):
     if request.method == "POST":
         form = StudyLogForm(request.POST)
