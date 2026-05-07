@@ -1,0 +1,33 @@
+{% extends 'tracker/base.html' %}
+
+{% block content %}
+
+<h2>➕ Add Study Log</h2>
+
+<form method="POST" class="mt-4">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label class="form-label">Date</label>
+        {{ form.date }}
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Hours</label>
+        {{ form.hours }}
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Topic</label>
+        {{ form.topic }}
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Notes</label>
+        {{ form.notes }}
+    </div>
+
+    <button type="submit" class="btn btn-success">Save</button>
+</form>
+
+{% endblock %}
