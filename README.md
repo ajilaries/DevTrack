@@ -193,7 +193,7 @@ This project was built to deeply understand:
 
 ---
 
-# 👨‍💻 Author
+# Author
 
 Developed by Ajil as part of backend engineering and Django learning journey.
 
