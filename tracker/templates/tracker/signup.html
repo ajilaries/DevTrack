@@ -2,14 +2,18 @@
 
 {% block content %}
 
-<h2>📝 Create Account</h2>
+<h2> Create Account</h2>
 
-<form method="POST" class="mt-4">
+<form method="POST">
+
     {% csrf_token %}
 
     {{ form.as_p }}
 
-    <button type="submit" class="btn btn-success">Sign Up</button>
+    <button type="submit" class="btn btn-success">
+        Sign Up
+    </button>
+
 </form>
 
 <p class="mt-3">
