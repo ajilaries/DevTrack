@@ -91,7 +91,7 @@ devtrack/
 ##  Clone Repository
 
 ```bash
-git clone <https://github.com/ajilaries/DevTrack.git>
+git clone https://github.com/ajilaries/DevTrack.git
 ```
 
 ---
