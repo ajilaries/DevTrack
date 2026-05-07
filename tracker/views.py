@@ -4,53 +4,57 @@ from .forms import StudyLogForm
 from django.contrib.auth import login,authenticate, logout
 from django.contrib.auth.decorators import login_required
 from .forms import SignupForm
+from django.contrib import messages
+from django.contrib.auth.forms import AuthenticationForm
 
 
 # signup
 def signup_view(request):
+    if request.method=="POST":
 
-    if request.method == "POST":
-
-        form = SignupForm(request.POST)
+        form=SignupForm(request.POST)
 
         if form.is_valid():
-            user = form.save()
+            form.save()
 
-            # Auto login after signup
-            login(request, user)
+            messages.success(
+                request,
+                "Account created successfully"
+            )
+            return redirect("login")
+        else:
+            form=SignupForm()
 
-            return redirect('dashboard')
-
-    else:
-        form = SignupForm()
-
-    # IMPORTANT 👇
-    return render(request, 'tracker/signup.html', {
-        'form': form
-    })
+        return render(
+            request,
+            "tracker/signup.html",{
+                "form":form
+            }
+        )
 
 # login
 def login_view(request):
-
-    if request.method == "POST":
-
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-
-        user = authenticate(
+    
+    if request.method=="POST":
+        form=AuthenticationForm(
             request,
-            username=username,
-            password=password
+            data=request.POST
         )
+        if form.is_valid():
+            user=form.get_user()
 
-        if user is not None:
-            login(request, user)
-            return redirect('dashboard')
+            login(request,user)
 
+            return redirect("dashboard")
         else:
-            return render(request, 'tracker/login.html', {
-                'error': 'Invalid username or password'
-            })
+            form=AuthenticationForm()
+
+        return render(
+            render,
+            "tracker/login.html",{
+                "form":form
+            }
+        )
 
     # IMPORTANT 👇
     return render(request, 'tracker/login.html')
@@ -115,3 +119,7 @@ def edit_log(request, id):
         form = StudyLogForm(instance=log)
 
     return render(request, 'tracker/edit_log.html', {'form': form})
+
+
+
+# AuthenticationForm does validation credentials, check password hash, prevents bad auth flow, integrates with sessions
