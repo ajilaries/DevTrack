@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
 from .models import StudyLog
-
+from .models import Profile
 
 # Study Log Form
 
@@ -85,3 +85,77 @@ def clean(self):
     return cleaned_data
     
 # UserCreationForm validates password, hashes password ,checks password match and validates usernames
+class ProfileForm(forms.ModelForm):
+
+    class Meta:
+        model=Profile
+
+        fields=[
+            'bio',
+            'github',
+            'linkedin'
+        ]
+        widgets={
+            'bio':forms.Textarea(attrs={
+                'class':'form-control',
+                'row':4
+            }),
+            'github': forms.URLInput(attrs={
+                'class': 'form-control'
+            }),
+
+            'linkedin': forms.URLInput(attrs={
+                'class': 'form-control'
+            }),
+
+        }
+    # bio validation    
+
+    def clean_bio(self):
+        bio=self.cleaned_data.get('bio')
+
+        if len(bio)<10:
+            raise forms.ValidationError(
+                "Bio must contain at least 10 characters."
+            )
+        return bio
+    
+    # Validate GitHub url
+
+    def clean_github(self):
+        github=self.cleaned_data.get('github')
+
+        if github and "github.com" not in github:
+
+            raise forms.ValidationError(
+                "Enter a valid Github profile URL."
+            )
+        return github
+
+    # validate linkedin URL
+
+    def clean_linkedin(self):
+        linkedin=self.cleaned_data.get('linkedin')
+
+        if linkedin and "linkedin.com" not in linkedin:
+            raise forms.ValidationError(
+                "Enter a valid linkedin profile URL"
+            )
+        return linkedin
+    
+
+    # clean() which is used for multi-field validation it validates: relationship between fields , buisness rules and logic validation
+    
+    def clean(self):
+        cleaned_data=super().clean()
+
+        github=cleaned_data.get('github')
+
+        linkedin=cleaned_data.get('linkedin')
+
+        if github== linkedin and github!="":
+            raise forms.ValidationError(
+                "Github and linkedin links cannot be identical"
+            )
+        return cleaned_data
+    

@@ -6,9 +6,13 @@ from django.contrib.auth.decorators import login_required
 from .forms import SignupForm
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
+from .forms import ProfileForm
+from .models import Profile
+from .decorators import unauthenticated_user, allowed_roles
 
 
 # signup
+@unauthenticated_user
 def signup_view(request):
     if request.method=="POST":
 
@@ -33,6 +37,7 @@ def signup_view(request):
         )
 
 # login
+@unauthenticated_user
 def login_view(request):
     
     if request.method=="POST":
@@ -123,3 +128,43 @@ def edit_log(request, id):
 
 
 # AuthenticationForm does validation credentials, check password hash, prevents bad auth flow, integrates with sessions
+
+@login_required
+def profile_view(request):
+
+    profile, created=Profile.objects.get_or_create(
+        user=request.user
+    )
+
+    if request.method=="POST":
+        form=ProfileForm(
+            request.POST,
+            instance=profile
+
+        )
+        if form.is_valid():
+            form.save()
+
+            return redirect('profile')
+    else:
+        form=ProfileForm(
+            instance=profile
+        )
+    return render(
+        request,
+        'tracker/profile.html',
+        {
+            'form':form
+        }
+    )
+
+
+@allowed_roles(
+    allowed_roles=['admin']
+
+)
+def admin_dashboard(request):
+    return render(
+        request,
+        'tracker/admin.html'
+    )
