@@ -9,6 +9,21 @@ from django.contrib.auth.forms import AuthenticationForm
 from .forms import ProfileForm
 from .models import Profile
 from .decorators import unauthenticated_user, allowed_roles
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from .serializers import StudyLogSerializer
+
+@api_view(['GET'])
+def api_logs(request):
+    logs=StudyLog.objects.all()
+
+    serializer=StudyLogSerializer(
+        logs,
+        many=True
+    )
+
+    return Response(serializer.data)
+
 
 
 # signup
