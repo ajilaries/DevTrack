@@ -9,25 +9,41 @@ from django.contrib.auth.forms import AuthenticationForm
 from .forms import ProfileForm
 from .models import Profile
 from .decorators import unauthenticated_user, allowed_roles
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from .serializers import StudyLogSerializer
+
+@api_view(['GET'])
+def api_logs(request):
+    logs=StudyLog.objects.all()
+
+    serializer=StudyLogSerializer(
+        logs,
+        many=True
+    )
+
+    return Response(serializer.data)
+
 
 
 # signup
 @unauthenticated_user
 def signup_view(request):
-    if request.method=="POST":
 
+    if request.method=="POST":
         form=SignupForm(request.POST)
 
         if form.is_valid():
+
             form.save()
 
-            messages.success(
+            messages.sucess(
                 request,
-                "Account created successfully"
+                "Account created sucessfully"
             )
             return redirect("login")
         else:
-            form=SignupForm()
+            form=SignupForm
 
         return render(
             request,
@@ -35,36 +51,56 @@ def signup_view(request):
                 "form":form
             }
         )
-
 # login
 @unauthenticated_user
 def login_view(request):
-    
-    if request.method=="POST":
-        form=AuthenticationForm(
+
+    if request.method == "POST":
+
+        form = AuthenticationForm(
             request,
             data=request.POST
         )
-        if form.is_valid():
-            user=form.get_user()
 
-            login(request,user)
+        if form.is_valid():
+
+            user = form.get_user()
+
+            login(request, user)
+
+            messages.success(
+                request,
+                f"Welcome {user.username}!"
+            )
 
             return redirect("dashboard")
+
         else:
-            form=AuthenticationForm()
 
-        return render(
-            render,
-            "tracker/login.html",{
-                "form":form
-            }
-        )
+            messages.error(
+                request,
+                "Invalid username or password"
+            )
 
-    # IMPORTANT 👇
+    else:
+        form = AuthenticationForm()
+
+    return render(
+        request,
+        "tracker/login.html",
+        {
+            "form": form
+        }
+    )
+
     return render(request, 'tracker/login.html')
 def logout_view(request):
     logout(request)
+
+    messages.info(
+        request,
+        "Logged out sucessfully"
+    )
     return redirect('landing')
 
 def landing(request):
@@ -95,37 +131,86 @@ def dashboard(request):
         'tracker/dashboard.html',
         context
     )
+@login_required
 def add_log(request):
-    if request.method == "POST":
-        form = StudyLogForm(request.POST)
+
+    if request.method=="POST":
+
+        form=StudyLogForm(request.POST)
+
         if form.is_valid():
-            form.save()
-            return redirect('home')
+            log=form.save(commit=False)
+            log.user=request.user
+
+            log.save()
+
+            messages.success(
+                request,
+                "Study log added successfully"
+            )
+            return redirect('dashboard')
+        
     else:
-        form = StudyLogForm()
+        form=StudyLogForm()
 
-    return render(request, 'tracker/add_log.html', {'form': form})
+    return render(
+        request,
+        'tracker/add_log.html',{
+            "form":form
+        }
+    )
 
-def delete_log(request , id):
-    log=get_object_or_404(StudyLog, id=id)
+@login_required
+def delete_log(request, id):
+
+    log=get_object_or_404(
+        StudyLog,
+        id=id,
+        user=request.user
+    )
     log.delete()
-    return redirect('home')
+
+    messages.warning(
+        request,
+        "Study log deleted"
+    )
+    return redirect('dashboard')
 
 
-def edit_log(request, id):
-    log = get_object_or_404(StudyLog, id=id)
+@login_required
+def edit_log(request,log):
 
-    if request.method == "POST":
-        form = StudyLogForm(request.POST, instance=log)
+    log=get_object_or_404(
+        StudyLog,
+        id=id,
+        user=request.user
+    )
+
+    if request.method=="POST":
+
+        form=StudyLogForm(
+            request.POST,
+            isinstance=log
+        )
+
         if form.is_valid():
+
             form.save()
-            return redirect('home')
+
+            messages.success(
+                request,
+                "Study log updated"
+            )
+            return redirect('dashboard')
     else:
-        form = StudyLogForm(instance=log)
+        form=StudyLogForm(instance=log)
 
-    return render(request, 'tracker/edit_log.html', {'form': form})
-
-
+    return render(
+        request,
+        'tracker/edit_log.html',{
+            "form":form
+        }
+    )
 
 # AuthenticationForm does validation credentials, check password hash, prevents bad auth flow, integrates with sessions
 
