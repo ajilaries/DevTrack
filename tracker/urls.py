@@ -14,4 +14,5 @@ urlpatterns = [
     path('edit/<int:id>/',views.edit_log, name='edit_log'),
     path('profile/',views.profile_view,name='profile'),
     path('api/logs/',views.api_logs,name='api_logs'),
+    path('api/logs/',views.StudyLogAPIView.as_view(), name='api_logs'),#as_view() is used to convert class into callale django view 
 ]

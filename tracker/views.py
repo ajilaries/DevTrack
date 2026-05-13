@@ -11,21 +11,37 @@ from .models import Profile
 from .decorators import unauthenticated_user, allowed_roles
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 from .serializers import StudyLogSerializer
 
-@api_view(['GET'])
+@api_view(['GET','POST'])
 def api_logs(request):
-    logs=StudyLog.objects.all()
+    # GET REQUEST
+    if request.method=='GET':
+        logs=StudyLog.objects.all()
 
-    serializer=StudyLogSerializer(
-        logs,
-        many=True
-    )
+        serializer=StudyLogSerializer(
+            logs,
+            many=True
+        )
+        return Response(serializer.data)
+    
+    # POST REQUEST
+    elif request.method=='POST':
 
-    return Response(serializer.data)
+        serializer=StudyLogSerializer(
+            data=request.data
+        )
 
+        if serializer.is_valid():
+            serializer.save(
+                user=request.user
+            )
 
-
+            return Response(serializer.data)
+    return Response(serializer.errors)
+        
 # signup
 @unauthenticated_user
 def signup_view(request):
@@ -253,3 +269,38 @@ def admin_dashboard(request):
         request,
         'tracker/admin.html'
     )
+
+class StudyLogAPIView(APIView):
+
+    permission_classes=[IsAuthenticated]
+
+    # GET REQUEST
+    def get(self, request):
+
+        logs=StudyLog.objects.filter(
+            user=request.user
+        )
+
+        serializer=StudyLogSerializer(
+            logs,
+            many=True
+        )
+
+        return Response(serializer.data)
+    
+    #POST REQUEST
+
+    def post(self, request):
+
+        serializer=StudyLogSerializer(
+            data=request.data
+        )
+
+        if serializer.is_valid():
+            
+            serializer.save(
+                user=request.user
+
+            )
+            return Response(serializer.data)
+        return Response(serializer.errors)
