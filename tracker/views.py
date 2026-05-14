@@ -14,6 +14,23 @@ from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from .serializers import StudyLogSerializer
+from rest_framework import generics
+
+class StudyLogAPIView(
+    generics.ListCreateAPIView
+):
+    serializer_class=StudyLogSerializer
+
+    permission_classes=[IsAuthenticated]
+
+    def get_queryset(self):
+        return StudyLog.objects.filter(
+            user=self.request.user
+        )
+    def perform_create(self, serializer):
+        serializer.save(
+            user=self.request.user
+        )
 
 @api_view(['GET','POST'])
 def api_logs(request):
@@ -270,37 +287,18 @@ def admin_dashboard(request):
         'tracker/admin.html'
     )
 
-class StudyLogAPIView(APIView):
+#Single log API for updating, deleting and retriving one object using single Class
+class SingleStudyLogAPIView(
+    generics.RetrieveUpdateDestroyAPIView
+
+):
+    serializer_class=StudyLogSerializer
 
     permission_classes=[IsAuthenticated]
 
-    # GET REQUEST
-    def get(self, request):
+    lookup_field='id'
 
-        logs=StudyLog.objects.filter(
-            user=request.user
+    def get_queryset(self):
+        return StudyLog.objects.filter(
+            user=self.request.user
         )
-
-        serializer=StudyLogSerializer(
-            logs,
-            many=True
-        )
-
-        return Response(serializer.data)
-    
-    #POST REQUEST
-
-    def post(self, request):
-
-        serializer=StudyLogSerializer(
-            data=request.data
-        )
-
-        if serializer.is_valid():
-            
-            serializer.save(
-                user=request.user
-
-            )
-            return Response(serializer.data)
-        return Response(serializer.errors)
