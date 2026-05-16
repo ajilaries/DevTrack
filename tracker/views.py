@@ -15,6 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from .serializers import StudyLogSerializer
 from rest_framework import generics
+from rest_framework import viewsets
 
 class StudyLogAPIView(
     generics.ListCreateAPIView
@@ -300,5 +301,25 @@ class SingleStudyLogAPIView(
 
     def get_queryset(self):
         return StudyLog.objects.filter(
+            user=self.request.user
+        )
+    
+
+class StudyLogViewSet(
+    viewsets.ModelViewSet
+):
+    
+    serializer_class=StudyLogSerializer
+
+    permission_classes =[IsAuthenticated]
+
+    lookup_field='id'
+
+    def get_queryset(self):
+        return StudyLog.objects.filter(
+            user=self.request.user
+        )
+    def perform_create(self,serializer):
+        serializer.save(
             user=self.request.user
         )
