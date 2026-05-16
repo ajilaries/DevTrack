@@ -133,3 +133,13 @@ LOGIN_URL='login'
 LOGIN_REDIRECT_URL='dashboard'
 
 LOGOUT_REDIRECT_URL='login'
+
+REST_FRAMEWORK = {
+
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+
+    ),
+
+}
