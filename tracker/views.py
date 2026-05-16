@@ -16,23 +16,84 @@ from rest_framework.views import APIView
 from .serializers import StudyLogSerializer
 from rest_framework import generics
 from rest_framework import viewsets
+from .permissions import IsOwner
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 
-class StudyLogAPIView(
-    generics.ListCreateAPIView
+
+class StudyLogViewSet(
+
+    viewsets.ModelViewSet
+
 ):
-    serializer_class=StudyLogSerializer
 
-    permission_classes=[IsAuthenticated]
+    serializer_class = StudyLogSerializer
 
+    permission_classes = [
+
+        IsAuthenticated,
+        IsOwner
+
+    ]
+
+    lookup_field = 'id'
+
+    
+    # FILTERING
+    filter_backends = [
+
+        DjangoFilterBackend,
+
+        filters.SearchFilter,
+
+        filters.OrderingFilter
+
+    ]
+
+    
+    # EXACT FILTERS
+    filterset_fields = [
+
+        'topic',
+
+        'hours'
+
+    ]
+
+    
+    # SEARCH
+    search_fields = [
+
+        'topic',
+
+        'notes'
+
+    ]
+
+    
+    # ORDERING
+    ordering_fields = [
+
+        'date',
+
+        'hours'
+
+    ]
+
+    
     def get_queryset(self):
+
         return StudyLog.objects.filter(
             user=self.request.user
         )
+
+    
     def perform_create(self, serializer):
+
         serializer.save(
             user=self.request.user
         )
-
+        
 @api_view(['GET','POST'])
 def api_logs(request):
     # GET REQUEST
