@@ -6,6 +6,10 @@ from django.dispatch import receiver
 
 from .models import Profile
 
+from .models import Notification
+from django.db.models.signals import post_save
+from .models import  StudyLog
+
 @receiver(post_save, sender=User)
 
 def create_profile(sender, instance, created, **kwargs):
@@ -15,3 +19,23 @@ def create_profile(sender, instance, created, **kwargs):
             user=instance
         )
 
+@receiver(post_save, sender=StudyLog)
+
+def create_study_notification(
+
+    sender,
+    instance,
+    created,
+    **kwargs
+
+):
+
+    if created:
+
+        Notification.objects.create(
+
+            user=instance.user,
+
+            message=f'New study log added: {instance.topic}'
+
+        )

@@ -16,19 +16,87 @@ from rest_framework.views import APIView
 from .serializers import StudyLogSerializer
 from rest_framework import generics
 from rest_framework import viewsets
+from .permissions import IsOwner
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
+from django.contrib.auth.models import Group
+from rest_framework.decorators import permission_classes
+from .serializers import NotificationSerializer
+from .models import Notification
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
-class StudyLogAPIView(
-    generics.ListCreateAPIView
+
+
+class StudyLogViewSet(
+
+    viewsets.ModelViewSet
+
 ):
-    serializer_class=StudyLogSerializer
 
-    permission_classes=[IsAuthenticated]
+    serializer_class = StudyLogSerializer
 
+    permission_classes = [
+
+        IsAuthenticated,
+        IsOwner
+
+    ]
+
+    lookup_field = 'id'
+
+    
+    # FILTERING
+    filter_backends = [
+
+        DjangoFilterBackend,
+
+        filters.SearchFilter,
+
+        filters.OrderingFilter
+
+    ]
+
+    
+    # EXACT FILTERS
+    filterset_fields = [
+
+        'topic',
+
+        'hours'
+
+    ]
+
+    
+    # SEARCH
+    search_fields = [
+
+        'topic',
+
+        'notes'
+
+    ]
+
+    
+    # ORDERING
+    ordering_fields = [
+
+        'date',
+
+        'hours'
+
+    ]
+
+    
     def get_queryset(self):
+
         return StudyLog.objects.filter(
             user=self.request.user
         )
+
+    
     def perform_create(self, serializer):
+
         serializer.save(
             user=self.request.user
         )
@@ -278,15 +346,17 @@ def profile_view(request):
     )
 
 
-@allowed_roles(
-    allowed_roles=['admin']
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 
-)
 def admin_dashboard(request):
-    return render(
-        request,
-        'tracker/admin.html'
-    )
+    if not is_admin(request.user):
+        return Response({
+            'error':'Admin Only'
+        },status=403)
+    return Response({
+        'message':'Welcome Admin'
+    })
 
 #Single log API for updating, deleting and retriving one object using single Class
 class SingleStudyLogAPIView(
@@ -323,3 +393,46 @@ class StudyLogViewSet(
         serializer.save(
             user=self.request.user
         )
+
+def is_admin(user):
+    return user.groups.filter(
+        name='Admin'
+    ).exists()
+
+
+class NotificationViewSet(
+    viewsets.ModelViewSet
+):
+    serializer_class=NotificationSerializer
+
+    permission_classes=[
+        IsAuthenticated
+    ]
+
+    def filter_queryset(self):
+        return Notification.objects.filter(
+            user=self.request.user
+
+        ).order_by('-created_at')
+    
+    @action(
+        detail=True,
+        methods=['POST']
+    )
+
+    def mark_as_read(
+        self,
+        request,
+        pk=None
+    ):
+        notification=self.get_object()
+
+        notification.is_read=True
+        
+        notification.save()
+
+        return Response({
+            'message':'Notification marked as read'
+        })
+
+
