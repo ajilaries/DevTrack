@@ -27,11 +27,20 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 
+# Study Log API
 router.register(
     'api/logs',
     views.StudyLogViewSet,
     basename='logs'
+
 )
+# Notification API
+router.register(
+    'api/notifications',
+    views.NotificationViewSet,
+    basename='notifications'
+)
+
 
 
 urlpatterns = [
@@ -70,5 +79,7 @@ urlpatterns = [
         ),
         name='swagger-ui'
     ),
+
+    path('', include(router.urls)),
 
 ]
