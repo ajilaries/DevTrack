@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tracker',
     'rest_framework',
-    'django-filters'
+    'django_filters',
+    'drf_yasg'
 ]
 
 MIDDLEWARE = [
@@ -153,5 +154,13 @@ REST_FRAMEWORK = {
     'rest_framework.pagination.PageNumberPagination',
 
     'PAGE_SIZE':5,
+
+    # Throttle
+    'DEFAULT_THROTTLE_CLASSES':[
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES':{
+        'user':'10/minute',
+    }
 
 }
