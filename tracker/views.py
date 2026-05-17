@@ -21,6 +21,10 @@ from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.models import Group
 from rest_framework.decorators import permission_classes
+from .serializers import NotificationSerializer
+from .models import Notification
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 
 
@@ -394,3 +398,41 @@ def is_admin(user):
     return user.groups.filter(
         name='Admin'
     ).exists()
+
+
+class NotificationViewSet(
+    viewsets.ModelViewSet
+):
+    serializer_class=NotificationSerializer
+
+    permission_classes=[
+        IsAuthenticated
+    ]
+
+    def filter_queryset(self):
+        return Notification.objects.filter(
+            user=self.request.user
+
+        ).order_by('-created_at')
+    
+    @action(
+        detail=True,
+        methods=['POST']
+    )
+
+    def mark_as_read(
+        self,
+        request,
+        pk=None
+    ):
+        notification=self.get_object()
+
+        notification.is_read=True
+        
+        notification.save()
+
+        return Response({
+            'message':'Notification marked as read'
+        })
+
+
