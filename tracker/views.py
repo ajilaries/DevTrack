@@ -19,6 +19,9 @@ from rest_framework import viewsets
 from .permissions import IsOwner
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
+from django.contrib.auth.models import Group
+from rest_framework.decorators import permission_classes
+
 
 
 class StudyLogViewSet(
@@ -93,7 +96,7 @@ class StudyLogViewSet(
         serializer.save(
             user=self.request.user
         )
-        
+
 @api_view(['GET','POST'])
 def api_logs(request):
     # GET REQUEST
@@ -339,15 +342,17 @@ def profile_view(request):
     )
 
 
-@allowed_roles(
-    allowed_roles=['admin']
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 
-)
 def admin_dashboard(request):
-    return render(
-        request,
-        'tracker/admin.html'
-    )
+    if not is_admin(request.user):
+        return Response({
+            'error':'Admin Only'
+        },status=403)
+    return Response({
+        'message':'Welcome Admin'
+    })
 
 #Single log API for updating, deleting and retriving one object using single Class
 class SingleStudyLogAPIView(
@@ -384,3 +389,8 @@ class StudyLogViewSet(
         serializer.save(
             user=self.request.user
         )
+
+def is_admin(user):
+    return user.groups.filter(
+        name='Admin'
+    ).exists()
