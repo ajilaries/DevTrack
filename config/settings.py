@@ -164,3 +164,4 @@ REST_FRAMEWORK = {
     }
 
 }
+# AUTH_USER_MODEL='tracker.CustomUser'

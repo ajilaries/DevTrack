@@ -25,6 +25,7 @@ from .serializers import NotificationSerializer
 from .models import Notification
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from .permissions import IsNotificationOwner
 
 
 
@@ -406,7 +407,9 @@ class NotificationViewSet(
     serializer_class=NotificationSerializer
 
     permission_classes=[
-        IsAuthenticated
+        IsAuthenticated,
+        IsNotificationOwner
+        
     ]
 
     def filter_queryset(self):
@@ -434,5 +437,66 @@ class NotificationViewSet(
         return Response({
             'message':'Notification marked as read'
         })
+    @action(
 
+        detail=False,
 
+        methods=['GET']
+
+    )
+
+    def unread_count(
+
+        self,
+        request
+
+    ):
+
+        count = Notification.objects.filter(
+
+            user=request.user,
+
+            is_read=False
+
+        ).count()
+
+        return Response({
+
+            'unread_count': count
+
+        })
+
+    @action(
+
+        detail=False,
+
+        methods=['POST']
+
+    )
+
+    def mark_all_as_read(
+
+        self,
+        request
+
+    ):
+        
+
+        Notification.objects.filter(
+
+            user=request.user,
+
+            is_read=False
+
+        ).update(is_read=True)
+
+        return Notification.objects.filter(
+            user=request.user
+
+        ).order_by('-created_at')
+
+        return Response({
+
+            'message': 'All notifications marked as read'
+
+        })
