@@ -56,7 +56,8 @@ class Notification(models.Model):
 
     )
     message=models.CharField(
-        max_length=225
+        max_length=225,
+        blank=False
 
     )
     is_read=models.BooleanField(
