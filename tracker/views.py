@@ -1,31 +1,48 @@
-from django.shortcuts import render, redirect,get_object_or_404
-from .models import StudyLog
-from .forms import StudyLogForm
-from django.contrib.auth import login,authenticate, logout
+from django.shortcuts import render,redirect, get_object_or_404
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from .forms import SignupForm
-from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
-from .forms import ProfileForm
-from .models import Profile
-from .decorators import unauthenticated_user, allowed_roles
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
-from .serializers import StudyLogSerializer
-from rest_framework import generics
-from rest_framework import viewsets
-from .permissions import IsOwner
-from rest_framework import filters
-from django_filters.rest_framework import DjangoFilterBackend
+from django.contrib import messages
 from django.contrib.auth.models import Group
-from rest_framework.decorators import permission_classes
-from .serializers import NotificationSerializer
-from .models import Notification
-from rest_framework.decorators import action
+
+#DRF
+from rest_framework import generics,viewsets, filters
 from rest_framework.response import Response
-from .permissions import IsNotificationOwner
+from rest_framework.decorators import(
+    api_view,
+    permission_classes,
+    action
+
+)
+from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+
+#Local
+from .models import(
+    StudyLog,
+    Profile,
+    Notification
+)
+
+from .forms import(
+    StudyLogForm,
+    SignupForm,
+    ProfileForm
+)
+from .serializers import(
+    StudyLogSerializer,
+    NotificationSerializer
+)
+
+from .permissions import(
+    IsOwner,
+    IsNotificationOwner
+)
+
+from .decorators import(
+    unauthenticated_user,
+    allowed_roles
+)
 
 
 
@@ -281,7 +298,7 @@ def delete_log(request, id):
 
 
 @login_required
-def edit_log(request,log):
+def edit_log(request, id):
 
     log=get_object_or_404(
         StudyLog,
@@ -290,10 +307,9 @@ def edit_log(request,log):
     )
 
     if request.method=="POST":
-
-        form=StudyLogForm(
+        form =StudyLogForm(
             request.POST,
-            isinstance=log
+            instance=log
         )
 
         if form.is_valid():
@@ -302,19 +318,21 @@ def edit_log(request,log):
 
             messages.success(
                 request,
-                "Study log updated"
+                "study log updated"
             )
             return redirect('dashboard')
+        
     else:
-        form=StudyLogForm(instance=log)
-
-    return render(
-        request,
-        'tracker/edit_log.html',{
-            "form":form
-        }
-    )
-
+        form=StudyLogForm(
+            instance=log,
+        )
+        return render(
+            request,
+            'tracker/edit_log.html',
+            {
+                "form":form
+            }
+        )
 # AuthenticationForm does validation credentials, check password hash, prevents bad auth flow, integrates with sessions
 
 @login_required
@@ -376,10 +394,6 @@ class SingleStudyLogAPIView(
         )
     
 
-class StudyLogViewSet(
-    viewsets.ModelViewSet
-):
-    
     serializer_class=StudyLogSerializer
 
     permission_classes =[IsAuthenticated]
@@ -412,7 +426,7 @@ class NotificationViewSet(
         
     ]
 
-    def filter_queryset(self):
+    def get_queryset(self):
         return Notification.objects.filter(
             user=self.request.user
 
