@@ -165,3 +165,17 @@ REST_FRAMEWORK = {
 
 }
 # AUTH_USER_MODEL='tracker.CustomUser'
+
+
+# Swagger settings for better authorizations
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'Enter: Bearer <your_token>'
+        }
+    }
+}
