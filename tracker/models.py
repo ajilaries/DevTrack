@@ -24,6 +24,11 @@ class Profile(models.Model):
     bio=models.TextField(
         blank=True
     )
+
+    profile_picture=models.ImageField(
+        upload_to='profile_picture',
+        default='default.png'
+    )
     
     github=models.URLField(
         blank=True
