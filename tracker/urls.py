@@ -3,17 +3,62 @@ from . import views
 
 urlpatterns = [
 
-    path('',views.landing , name='landing'),
-    path('signup/',views.signup_view, name='signpu'),
-    path('login/',views.login_view,name='login'),
-    path('/dashboard/',views.dashboard,name='dashboard'),
-    path('logout/',views.logout_view, name='logout'),
+    # Website Routes
+    path('', views.landing, name='landing'),
+
+    path('signup/', views.signup_view, name='signup'),
+
+    path('login/', views.login_view, name='login'),
+
+    path('logout/', views.logout_view, name='logout'),
+
+    path('dashboard/', views.dashboard, name='dashboard'),
+
     path('home/', views.home, name='home'),
-    path('add/',views.add_log, name='add_log'),
-    path('delete/<int:id>/', views.delete_log, name='delete_log'),
-    path('edit/<int:id>/',views.edit_log, name='edit_log'),
-    path('profile/',views.profile_view,name='profile'),
-    path('api/logs/',views.api_logs,name='api_logs'),
-    # path('api/logs/',views.StudyLogAPIView.as_view(), name='api_logs'),#as_view() is used to convert class into callale django view 
-    path('api/logs/<int:id>/', views.SingleStudyLogAPIView.as_view(),name='single_log_api'),
+
+    path('profile/', views.profile_view, name='profile'),
+
+    path('profile/edit/',views.edit_profile, name='edit_profile'),
+
+    
+    # Study Logs
+    path('add/', views.add_log, name='add_log'),
+
+    path(
+        'edit/<int:id>/',
+        views.edit_log,
+        name='edit_log'
+    ),
+
+    path(
+        'delete/<int:id>/',
+        views.delete_log,
+        name='delete_log'
+    ),
+
+    
+    # API Routes
+    path(
+        'api/logs/',
+        views.api_logs,
+        name='api_logs'
+    ),
+
+    path(
+        'api/logs/<int:id>/',
+        views.SingleStudyLogAPIView.as_view(),
+        name='single_log_api'
+    ),
+    # Notifications Routes
+    path(
+        'notifications/',
+        views.notifications_page,
+        name='notifications'
+    ),
+
+    path(
+        'notifications/read/<int:id>/',
+        views.mark_notification_read,
+        name='mark_notification_read'
+    ),
 ]
