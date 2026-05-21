@@ -434,44 +434,50 @@ def edit_log(request, id):
 @login_required
 def profile_view(request):
 
-    profile, created = Profile.objects.get_or_create(
+    profile,created=Profile.objects.get_or_create(
         user=request.user
     )
-
-    if request.method == "POST":
-
-        form = ProfileForm(
-            request.POST,
-            instance=profile
-        )
-
-        if form.is_valid():
-
-            form.save()
-
-            Notification.objects.create(
-                user=request.user,
-                message='Profile updated sucessfully'
-            )
-
-            messages.success(
-                request,
-                "Profile updated successfully"
-            )
-
-            return redirect('profile')
-
-    else:
-
-        form = ProfileForm(
-            instance=profile
-        )
 
     return render(
         request,
         'tracker/profile.html',
         {
-            'form': form
+            'profile':profile
+        }
+    )
+
+@login_required
+def edit_profile(request):
+
+    profile,created=Profile.objects.get_or_create(
+        user=request.user
+    )
+
+    if request.method=="POST":
+
+        form=ProfileForm(
+            request.POST,
+            instance=profile
+        )
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request,
+                "Profile updated successfully"
+            )
+            return redirect('profile')
+    else:
+        form=ProfileForm(
+            instance=profile
+        )
+
+    return render(
+        request,
+        'tracker/edit_profile.html',
+        {
+            'form':form
         }
     )
 
