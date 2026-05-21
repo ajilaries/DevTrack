@@ -52,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
@@ -191,6 +192,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 
 ALLOWED_HOSTS=[
-    '*'
+    'Aries001.pythonanywhere.com'
 ]
 
