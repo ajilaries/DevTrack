@@ -186,6 +186,11 @@ def login_view(request):
             user = form.get_user()
 
             login(request, user)
+            
+            Notification.objects.create(
+                user=user,
+                message='You logged into your account'
+            )
 
             messages.success(
                 request,
@@ -217,6 +222,11 @@ def login_view(request):
 # LOGOUT
 
 def logout_view(request):
+
+    Notification.objects.create(
+        user=request.user,
+        message='You logged out'
+    )
 
     logout(request)
 
@@ -262,18 +272,25 @@ def home(request):
 @login_required
 def dashboard(request):
 
-    logs = StudyLog.objects.filter(
+    logs=StudyLog.objects.filter(
         user=request.user
     )
 
-    total_hours = 0
+    total_hours=0
 
     for log in logs:
-        total_hours += log.hours
+        total_hours+=log.hours
 
-    context = {
-        'logs': logs,
-        'total_hours': total_hours
+    unread_notifications_count=Notification.objects.filter(
+        user=request.user,
+        is_read=False
+    ).count()
+
+    context={
+        'logs':logs,
+        'total_hours':total_hours,
+        'unread_notifications_count':unread_notifications_count
+
     }
 
     return render(
@@ -339,15 +356,18 @@ def delete_log(request, id):
         user=request.user
     )
 
-    topic = log.topic
+    deleted_topic = log.topic
+
+    log.delete()
+
+
 
     # Notification before delete
     Notification.objects.create(
         user=request.user,
-        message=f'Study log deleted: {topic}'
+        message=f'Study log deleted: {deleted_topic}'
     )
 
-    log.delete()
 
     messages.warning(
         request,
@@ -428,6 +448,11 @@ def profile_view(request):
         if form.is_valid():
 
             form.save()
+
+            Notification.objects.create(
+                user=request.user,
+                message='Profile updated sucessfully'
+            )
 
             messages.success(
                 request,
