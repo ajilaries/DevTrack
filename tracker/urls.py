@@ -18,6 +18,8 @@ urlpatterns = [
 
     path('profile/', views.profile_view, name='profile'),
 
+    path('profile/edit/',views.edit_profile, name='edit_profile'),
+
     
     # Study Logs
     path('add/', views.add_log, name='add_log'),
