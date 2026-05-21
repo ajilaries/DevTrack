@@ -47,4 +47,16 @@ urlpatterns = [
         views.SingleStudyLogAPIView.as_view(),
         name='single_log_api'
     ),
+    # Notifications Routes
+    path(
+        'notifications/',
+        views.notifications_page,
+        name='notifications'
+    ),
+
+    path(
+        'notifications/read/<int:id>/',
+        views.mark_notification_read,
+        name='mark_notification_read'
+    ),
 ]
