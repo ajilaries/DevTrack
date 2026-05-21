@@ -92,6 +92,7 @@ class ProfileForm(forms.ModelForm):
 
         fields=[
             'bio',
+            'profile_picture',
             'github',
             'linkedin'
         ]
