@@ -415,104 +415,91 @@ def is_admin(user):
     ).exists()
 
 
-class NotificationViewSet(
-    viewsets.ModelViewSet
-):
-    serializer_class=NotificationSerializer
+class NotificationViewSet(viewsets.ModelViewSet):
 
-    permission_classes=[
+    serializer_class = NotificationSerializer
+
+    permission_classes = [
         IsAuthenticated,
         IsNotificationOwner
-        
     ]
 
     def get_queryset(self):
-        if getattr(self,'swagger_fake_view',False):
+
+        if getattr(self, 'swagger_fake_view', False):
             return Notification.objects.none()
-        
+
         return Notification.objects.filter(
             user=self.request.user
-
         ).order_by('-created_at')
-    @action(
-        detail=True,
-        methods=['POST']
-    )
 
-    def mark_as_read(
-        self,
-        request,
-        pk=None
-    ):
-        notification=self.get_object()
+    @action(detail=True, methods=['POST'])
+    def mark_as_read(self, request, pk=None):
 
-        notification.is_read=True
-        
+        notification = self.get_object()
+
+        notification.is_read = True
         notification.save()
 
         return Response({
-            'message':'Notification marked as read'
+            'message': 'Notification marked as read'
         })
-    @action(
 
-        detail=False,
-
-        methods=['GET']
-
-    )
-
-    def unread_count(
-
-        self,
-        request
-
-    ):
+    @action(detail=False, methods=['GET'])
+    def unread_count(self, request):
 
         count = Notification.objects.filter(
-
             user=request.user,
-
             is_read=False
-
         ).count()
 
         return Response({
-
             'unread_count': count
-
         })
 
-    @action(
-
-        detail=False,
-
-        methods=['POST']
-
-    )
-
-    def mark_all_as_read(
-
-        self,
-        request
-
-    ):
-        
+    @action(detail=False, methods=['POST'])
+    def mark_all_as_read(self, request):
 
         Notification.objects.filter(
-
             user=request.user,
-
             is_read=False
-
         ).update(is_read=True)
 
-        return Notification.objects.filter(
-            user=request.user
+        return Response({
+            'message': 'All notifications marked as read'
+        })
 
+
+# -----------------------------
+# WEBSITE NOTIFICATION VIEWS
+# -----------------------------
+
+    @login_required
+    def notifications_page(request):
+
+        notifications = Notification.objects.filter(
+            user=request.user
         ).order_by('-created_at')
 
-        return Response({
+        return render(
+            request,
+            'tracker/notifications.html',
+            {
+                'notifications': notifications
+            }
+        )
 
-            'message': 'All notifications marked as read'
 
-        })
+    @login_required
+    def mark_notification_read(request, id):
+
+        notification = get_object_or_404(
+            Notification,
+            id=id,
+            user=request.user
+        )
+
+        notification.is_read = True
+        notification.save()
+
+        return redirect('notifications')
