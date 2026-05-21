@@ -1,177 +1,176 @@
-from django.shortcuts import render,redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth.models import Group
 
-#DRF
-from rest_framework import generics,viewsets, filters
+# DRF
+from rest_framework import generics, viewsets, filters
 from rest_framework.response import Response
-from rest_framework.decorators import(
+from rest_framework.decorators import (
     api_view,
     permission_classes,
     action
-
 )
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 
-#Local
-from .models import(
+# Local
+from .models import (
     StudyLog,
     Profile,
     Notification
 )
 
-from .forms import(
+from .forms import (
     StudyLogForm,
     SignupForm,
     ProfileForm
 )
-from .serializers import(
+
+from .serializers import (
     StudyLogSerializer,
     NotificationSerializer
 )
 
-from .permissions import(
+from .permissions import (
     IsOwner,
     IsNotificationOwner
 )
 
-from .decorators import(
+from .decorators import (
     unauthenticated_user,
     allowed_roles
 )
 
 
 
-class StudyLogViewSet(
+# API VIEWSET - STUDY LOG
 
-    viewsets.ModelViewSet
-
-):
+class StudyLogViewSet(viewsets.ModelViewSet):
 
     serializer_class = StudyLogSerializer
 
     permission_classes = [
-
         IsAuthenticated,
         IsOwner
-
     ]
 
     lookup_field = 'id'
 
-    
     # FILTERING
     filter_backends = [
-
         DjangoFilterBackend,
-
         filters.SearchFilter,
-
         filters.OrderingFilter
-
     ]
 
-    
     # EXACT FILTERS
     filterset_fields = [
-
         'topic',
-
         'hours'
-
     ]
 
-    
     # SEARCH
     search_fields = [
-
         'topic',
-
         'notes'
-
     ]
 
-    
     # ORDERING
     ordering_fields = [
-
         'date',
-
         'hours'
-
     ]
 
-    
     def get_queryset(self):
 
         return StudyLog.objects.filter(
             user=self.request.user
         )
 
-    
     def perform_create(self, serializer):
 
         serializer.save(
             user=self.request.user
         )
 
-@api_view(['GET','POST'])
-def api_logs(request):
-    # GET REQUEST
-    if request.method=='GET':
-        logs=StudyLog.objects.all()
 
-        serializer=StudyLogSerializer(
+# API LOGS FUNCTION
+
+
+@api_view(['GET', 'POST'])
+def api_logs(request):
+
+    # GET REQUEST
+    if request.method == 'GET':
+
+        logs = StudyLog.objects.all()
+
+        serializer = StudyLogSerializer(
             logs,
             many=True
         )
-        return Response(serializer.data)
-    
-    # POST REQUEST
-    elif request.method=='POST':
 
-        serializer=StudyLogSerializer(
+        return Response(serializer.data)
+
+    # POST REQUEST
+    elif request.method == 'POST':
+
+        serializer = StudyLogSerializer(
             data=request.data
         )
 
         if serializer.is_valid():
+
             serializer.save(
                 user=request.user
             )
 
             return Response(serializer.data)
+
     return Response(serializer.errors)
-        
-# signup
+
+
+
+# SIGNUP
+
+
 @unauthenticated_user
 def signup_view(request):
 
-    if request.method=="POST":
-        form=SignupForm(request.POST)
+    if request.method == "POST":
+
+        form = SignupForm(request.POST)
 
         if form.is_valid():
 
             form.save()
 
-            messages.sucess(
+            messages.success(
                 request,
-                "Account created sucessfully"
+                "Account created successfully"
             )
-            return redirect("login")
-        else:
-            form=SignupForm
 
-        return render(
-            request,
-            "tracker/signup.html",{
-                "form":form
-            }
-        )
-# login
+            return redirect("login")
+
+    else:
+
+        form = SignupForm()
+
+    return render(
+        request,
+        "tracker/signup.html",
+        {
+            "form": form
+        }
+    )
+
+
+
+# LOGIN
+
 @unauthenticated_user
 def login_view(request):
 
@@ -203,6 +202,7 @@ def login_view(request):
             )
 
     else:
+
         form = AuthenticationForm()
 
     return render(
@@ -213,28 +213,58 @@ def login_view(request):
         }
     )
 
-    return render(request, 'tracker/login.html')
+
+# LOGOUT
+
 def logout_view(request):
+
     logout(request)
 
     messages.info(
         request,
-        "Logged out sucessfully"
+        "Logged out successfully"
     )
+
     return redirect('landing')
 
+
+
+# LANDING PAGE
+
+
 def landing(request):
-    return render(request,'tracker/landing.html')
+
+    return render(
+        request,
+        'tracker/landing.html'
+    )
+
+
+
+# HOME PAGE
 
 def home(request):
-    logs = StudyLog.objects.all().order_by('-date')
-    return render(request, 'tracker/home.html', {'logs': logs})
 
+    logs = StudyLog.objects.all().order_by('-date')
+
+    return render(
+        request,
+        'tracker/home.html',
+        {
+            'logs': logs
+        }
+    )
+
+
+
+# DASHBOARD
 
 @login_required
 def dashboard(request):
 
-    logs = StudyLog.objects.filter(user=request.user)
+    logs = StudyLog.objects.filter(
+        user=request.user
+    )
 
     total_hours = 0
 
@@ -251,63 +281,97 @@ def dashboard(request):
         'tracker/dashboard.html',
         context
     )
+
+
+
+# ADD LOG
+
 @login_required
 def add_log(request):
 
-    if request.method=="POST":
+    if request.method == "POST":
 
-        form=StudyLogForm(request.POST)
+        form = StudyLogForm(request.POST)
 
         if form.is_valid():
-            log=form.save(commit=False)
-            log.user=request.user
+
+            log = form.save(commit=False)
+
+            log.user = request.user
 
             log.save()
+
+            # Notification
+            Notification.objects.create(
+                user=request.user,
+                message=f'New study log added: {log.topic}'
+            )
 
             messages.success(
                 request,
                 "Study log added successfully"
             )
+
             return redirect('dashboard')
-        
+
     else:
-        form=StudyLogForm()
+
+        form = StudyLogForm()
 
     return render(
         request,
-        'tracker/add_log.html',{
-            "form":form
+        'tracker/add_log.html',
+        {
+            "form": form
         }
     )
+
+
+
+# DELETE LOG
 
 @login_required
 def delete_log(request, id):
 
-    log=get_object_or_404(
+    log = get_object_or_404(
         StudyLog,
         id=id,
         user=request.user
     )
+
+    topic = log.topic
+
+    # Notification before delete
+    Notification.objects.create(
+        user=request.user,
+        message=f'Study log deleted: {topic}'
+    )
+
     log.delete()
 
     messages.warning(
         request,
         "Study log deleted"
     )
+
     return redirect('dashboard')
 
+
+
+# EDIT LOG
 
 @login_required
 def edit_log(request, id):
 
-    log=get_object_or_404(
+    log = get_object_or_404(
         StudyLog,
         id=id,
         user=request.user
     )
 
-    if request.method=="POST":
-        form =StudyLogForm(
+    if request.method == "POST":
+
+        form = StudyLogForm(
             request.POST,
             instance=log
         )
@@ -316,103 +380,132 @@ def edit_log(request, id):
 
             form.save()
 
+            # Notification
+            Notification.objects.create(
+                user=request.user,
+                message=f'Study log updated: {log.topic}'
+            )
+
             messages.success(
                 request,
-                "study log updated"
+                "Study log updated"
             )
+
             return redirect('dashboard')
-        
+
     else:
-        form=StudyLogForm(
-            instance=log,
+
+        form = StudyLogForm(
+            instance=log
         )
-        return render(
-            request,
-            'tracker/edit_log.html',
-            {
-                "form":form
-            }
-        )
-# AuthenticationForm does validation credentials, check password hash, prevents bad auth flow, integrates with sessions
 
-@login_required
-def profile_view(request):
-
-    profile, created=Profile.objects.get_or_create(
-        user=request.user
-    )
-
-    if request.method=="POST":
-        form=ProfileForm(
-            request.POST,
-            instance=profile
-
-        )
-        if form.is_valid():
-            form.save()
-
-            return redirect('profile')
-    else:
-        form=ProfileForm(
-            instance=profile
-        )
     return render(
         request,
-        'tracker/profile.html',
+        'tracker/edit_log.html',
         {
-            'form':form
+            "form": form
         }
     )
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
 
-def admin_dashboard(request):
-    if not is_admin(request.user):
-        return Response({
-            'error':'Admin Only'
-        },status=403)
-    return Response({
-        'message':'Welcome Admin'
-    })
+# PROFILE
 
-#Single log API for updating, deleting and retriving one object using single Class
-class SingleStudyLogAPIView(
-    generics.RetrieveUpdateDestroyAPIView
+@login_required
+def profile_view(request):
 
-):
-    serializer_class=StudyLogSerializer
+    profile, created = Profile.objects.get_or_create(
+        user=request.user
+    )
 
-    permission_classes=[IsAuthenticated]
+    if request.method == "POST":
 
-    lookup_field='id'
-
-    def get_queryset(self):
-        return StudyLog.objects.filter(
-            user=self.request.user
+        form = ProfileForm(
+            request.POST,
+            instance=profile
         )
-    
 
-    serializer_class=StudyLogSerializer
+        if form.is_valid():
 
-    permission_classes =[IsAuthenticated]
+            form.save()
 
-    lookup_field='id'
+            messages.success(
+                request,
+                "Profile updated successfully"
+            )
 
-    def get_queryset(self):
-        return StudyLog.objects.filter(
-            user=self.request.user
+            return redirect('profile')
+
+    else:
+
+        form = ProfileForm(
+            instance=profile
         )
-    def perform_create(self,serializer):
-        serializer.save(
-            user=self.request.user
-        )
+
+    return render(
+        request,
+        'tracker/profile.html',
+        {
+            'form': form
+        }
+    )
+
+
+
+# ADMIN CHECK
+
 
 def is_admin(user):
+
     return user.groups.filter(
         name='Admin'
     ).exists()
+
+
+
+# ADMIN DASHBOARD API
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_dashboard(request):
+
+    if not is_admin(request.user):
+
+        return Response({
+            'error': 'Admin Only'
+        }, status=403)
+
+    return Response({
+        'message': 'Welcome Admin'
+    })
+
+
+
+# SINGLE STUDY LOG API
+
+
+class SingleStudyLogAPIView(
+    generics.RetrieveUpdateDestroyAPIView
+):
+
+    serializer_class = StudyLogSerializer
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    lookup_field = 'id'
+
+    def get_queryset(self):
+
+        return StudyLog.objects.filter(
+            user=self.request.user
+        )
+
+
+
+# NOTIFICATION API VIEWSET
 
 
 class NotificationViewSet(viewsets.ModelViewSet):
@@ -426,25 +519,30 @@ class NotificationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
 
+        # Swagger fix
         if getattr(self, 'swagger_fake_view', False):
+
             return Notification.objects.none()
 
         return Notification.objects.filter(
             user=self.request.user
         ).order_by('-created_at')
 
+    # MARK SINGLE AS READ
     @action(detail=True, methods=['POST'])
     def mark_as_read(self, request, pk=None):
 
         notification = self.get_object()
 
         notification.is_read = True
+
         notification.save()
 
         return Response({
             'message': 'Notification marked as read'
         })
 
+    # UNREAD COUNT
     @action(detail=False, methods=['GET'])
     def unread_count(self, request):
 
@@ -457,6 +555,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
             'unread_count': count
         })
 
+    # MARK ALL AS READ
     @action(detail=False, methods=['POST'])
     def mark_all_as_read(self, request):
 
@@ -470,36 +569,39 @@ class NotificationViewSet(viewsets.ModelViewSet):
         })
 
 
-# -----------------------------
-# WEBSITE NOTIFICATION VIEWS
-# -----------------------------
 
-    @login_required
-    def notifications_page(request):
-
-        notifications = Notification.objects.filter(
-            user=request.user
-        ).order_by('-created_at')
-
-        return render(
-            request,
-            'tracker/notifications.html',
-            {
-                'notifications': notifications
-            }
-        )
+# WEBSITE NOTIFICATION PAGE
 
 
-    @login_required
-    def mark_notification_read(request, id):
+@login_required
+def notifications_page(request):
 
-        notification = get_object_or_404(
-            Notification,
-            id=id,
-            user=request.user
-        )
+    notifications = Notification.objects.filter(
+        user=request.user
+    ).order_by('-created_at')
 
-        notification.is_read = True
-        notification.save()
+    return render(
+        request,
+        'tracker/notifications.html',
+        {
+            'notifications': notifications
+        }
+    )
 
-        return redirect('notifications')
+
+# MARK NOTIFICATION AS READ
+
+@login_required
+def mark_notification_read(request, id):
+
+    notification = get_object_or_404(
+        Notification,
+        id=id,
+        user=request.user
+    )
+
+    notification.is_read = True
+
+    notification.save()
+
+    return redirect('notifications')
