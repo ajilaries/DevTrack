@@ -12,7 +12,7 @@
 
             Study Dashboard 📚
 
-        </h2>
+        </h1>
 
         <p class="text-muted mb-0">
 
@@ -36,7 +36,7 @@
 
             Notifications
 
-            {% if unread_notifications_count > 0 %}
+            Add Log
 
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
 
@@ -44,7 +44,7 @@
 
                 </span>
 
-            {% endif %}
+            Profile
 
         </a>
 
@@ -60,7 +60,6 @@
 
             Profile
 
-        </a>
 
         
         <!-- ADD LOG -->
@@ -74,7 +73,113 @@
 
             Add Log
 
-        </a>
+    <!-- TOTAL HOURS -->
+
+    <div class="col-lg-4 col-md-6">
+
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <p class="text-muted mb-1">
+
+                            Total Study Hours
+
+                        </p>
+
+                        <h2 class="fw-bold text-primary">
+
+                            {{ total_hours }}
+
+                        </h2>
+
+                    </div>
+
+                    <i class="bi bi-clock-history display-5 text-primary"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TOTAL LOGS -->
+
+    <div class="col-lg-4 col-md-6">
+
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <p class="text-muted mb-1">
+
+                            Total Logs
+
+                        </p>
+
+                        <h2 class="fw-bold text-success">
+
+                            {{ logs.count }}
+
+                        </h2>
+
+                    </div>
+
+                    <i class="bi bi-journal-text display-5 text-success"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- STREAK -->
+
+    <div class="col-lg-4 col-md-12">
+
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <p class="text-muted mb-1">
+
+                            Study Streak
+
+                        </p>
+
+                        <h2 class="fw-bold text-warning">
+
+                            🔥 {{ streak|default:"0" }} Days
+
+                        </h2>
+
+                    </div>
+
+                    <i class="bi bi-fire display-5 text-warning"></i>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
