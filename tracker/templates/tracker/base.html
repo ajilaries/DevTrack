@@ -13,15 +13,24 @@
     <title>DevTrack</title>
 
     <!-- Bootstrap -->
+
     <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
     >
 
     <!-- Bootstrap Icons -->
+
     <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+
+    <!-- Google Font -->
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
     >
 
     <style>
@@ -30,422 +39,200 @@
             margin:0;
             padding:0;
             box-sizing:border-box;
+            font-family:'Poppins',sans-serif;
         }
 
         body{
-            background:#f4f7fc;
-            overflow-x:hidden;
-            font-family:Arial, sans-serif;
+            background:#f4f7fb;
+            min-height:100vh;
         }
 
-        /* SIDEBAR */
+        /* NAVBAR */
 
-        .sidebar{
-
-            width:260px;
-            height:100vh;
-
-            position:fixed;
-
-            left:0;
-            top:0;
-
-            background:#0f172a;
-
-            padding-top:25px;
-
-            transition:0.3s;
-
-            z-index:1000;
-
-        }
-
-        .sidebar-brand{
-
-            color:white;
-
-            font-size:28px;
-
-            font-weight:bold;
-
-            text-align:center;
-
-            margin-bottom:35px;
-
-        }
-
-        .sidebar a{
-
-            display:flex;
-
-            align-items:center;
-
-            gap:14px;
-
-            color:#cbd5e1;
-
-            padding:15px 24px;
-
-            text-decoration:none;
-
-            transition:0.3s;
-
-            font-weight:500;
-
-            margin:5px 12px;
-
-            border-radius:12px;
-
-        }
-
-        .sidebar a:hover{
-
-            background:#1e293b;
-
-            color:white;
-
-        }
-
-        .sidebar a.active{
-
-            background:#2563eb;
-
-            color:white;
-
-        }
-
-        /* MAIN CONTENT */
-
-        .main-content{
-
-            margin-left:260px;
-
-            padding:25px;
-
-        }
-
-        /* TOPBAR */
-
-        .topbar{
-
-            background:white;
-
-            border-radius:18px;
-
-            padding:18px 25px;
-
-            display:flex;
-
-            justify-content:space-between;
-
-            align-items:center;
-
-            margin-bottom:30px;
-
-            box-shadow:0 4px 20px rgba(0,0,0,0.06);
-
-        }
-
-        /* PROFILE IMAGE */
-
-        .profile-image{
-
-            width:45px;
-
-            height:45px;
-
-            border-radius:50%;
-
-            object-fit:cover;
-
-            border:2px solid #2563eb;
-
-        }
-
-        /* CARDS */
-
-        .card{
-
-            border:none;
-
-            border-radius:18px;
-
-            box-shadow:0 4px 18px rgba(0,0,0,0.05);
-
-        }
-
-        /* TABLE */
-
-        .table{
-
-            border-radius:15px;
-
-            overflow:hidden;
-
-        }
-
-        /* DARK MODE */
-
-        .dark-mode{
-
-            background:#020617 !important;
-
-            color:white;
-
-        }
-
-        .dark-mode .topbar,
-        .dark-mode .card,
-        .dark-mode .table{
-
-            background:#0f172a !important;
-
-            color:white !important;
-
-        }
-
-        .dark-mode .table-dark{
-
-            --bs-table-bg:#0f172a;
-
-        }
-
-        .dark-mode .sidebar{
-
-            background:#020617;
-
-        }
-
-        .dark-mode .text-muted{
-
-            color:#cbd5e1 !important;
-
-        }
-
-        /* MOBILE */
-
-        @media(max-width:768px){
-
-            .sidebar{
-
-                width:100%;
-                height:auto;
-                position:relative;
-
-            }
-
-            .main-content{
-
-                margin-left:0;
-
-            }
-
-            .topbar{
-
-                flex-direction:column;
-                gap:15px;
-                align-items:flex-start;
-
-            }
-
-        }
-        .dropdown-menu{
-        border-radius: 12px;
-        }
-
-        .dropdown-item:hover{
-            background-color:#f1f3f5;
+        .navbar{
+            padding:14px 0;
         }
 
         .navbar-brand{
+            font-size:1.5rem;
             letter-spacing:1px;
+        }
+
+        /* ALERTS */
+
+        .message-container{
+
+            position:fixed;
+
+            top:20px;
+
+            right:20px;
+
+            z-index:9999;
+
+            width:320px;
+
+        }
+
+        .auto-hide-message{
+            animation:slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn{
+
+            from{
+                opacity:0;
+                transform:translateX(100%);
+            }
+
+            to{
+                opacity:1;
+                transform:translateX(0);
+            }
+
+        }
+
+        /* DROPDOWN */
+
+        .dropdown-menu{
+            border:none;
+            border-radius:14px;
+            overflow:hidden;
+        }
+
+        .dropdown-item:hover{
+            background:#f1f3f5;
+        }
+
+        /* MAIN CONTAINER */
+
+        .main-container{
+            padding-top:30px;
+            padding-bottom:40px;
+        }
+
+        /* NOTIFICATION BADGE */
+
+        #notification-badge{
+            font-size:0.7rem;
+        }
+
+        /* CARD DESIGN */
+
+        .custom-card{
+            border:none;
+            border-radius:18px;
+            box-shadow:0 4px 20px rgba(0,0,0,0.06);
         }
 
     </style>
 
 </head>
 
-<body id="main-body">
+<body>
 
-<!-- SIDEBAR -->
+<!-- NAVBAR -->
 
-<div class="sidebar">
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
 
-    <div class="sidebar-brand">
+    <div class="container">
 
-        DevTrack 🚀
-
-    </div>
         <!-- LOGO -->
 
-        <a href="/" class="navbar-brand fw-bold fs-4">
+        <a
+            href="/"
+            class="navbar-brand fw-bold"
+        >
 
             <i class="bi bi-graph-up-arrow"></i>
             DevTrack
 
-    <a href="{% url 'dashboard' %}" class="active">
+        </a>
 
-        <i class="bi bi-grid-fill"></i>
+        <!-- MOBILE TOGGLER -->
 
-        Dashboard
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarContent"
+        >
 
-    </a>
-        {% if user.is_authenticated %}
+            <span class="navbar-toggler-icon"></span>
 
-        <div class="d-flex align-items-center gap-3">
+        </button>
 
-            <!-- NOTIFICATION DROPDOWN -->
+        <!-- NAVBAR CONTENT -->
 
-            <div class="dropdown">
+        <div
+            class="collapse navbar-collapse justify-content-end"
+            id="navbarContent"
+        >
 
-                <button
-                    class="btn btn-outline-light position-relative"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                >
+            {% if user.is_authenticated %}
 
-                    <i class="bi bi-bell-fill"></i>
+            <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
 
-                    <span
-                        id="notification-badge"
-                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                <!-- NOTIFICATIONS -->
+
+                <div class="dropdown">
+
+                    <button
+                        class="btn btn-outline-light position-relative"
+                        type="button"
+                        data-bs-toggle="dropdown"
                     >
 
-                        0
+                        <i class="bi bi-bell-fill"></i>
 
-                    </span>
+                        <span
+                            id="notification-badge"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                        >
 
-                </button>
+                            0
 
-                <ul
-                    class="dropdown-menu dropdown-menu-end shadow"
-                    id="notification-list"
-                    style="width: 320px;"
+                        </span>
+
+                    </button>
+
+                    <ul
+                        class="dropdown-menu dropdown-menu-end shadow"
+                        id="notification-list"
+                        style="width:320px;"
+                    >
+
+                        <li class="dropdown-item text-center text-muted">
+
+                            Loading notifications...
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+                <!-- USER -->
+
+                <span class="text-light fw-semibold">
+
+                    Hi, {{ request.user.username }}
+
+                </span>
+
+                <!-- LOGOUT -->
+
+                <a
+                    href="{% url 'logout' %}"
+                    class="btn btn-danger btn-sm"
                 >
 
-                    <li class="dropdown-item text-center text-muted">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Logout
 
-                        Loading...
-
-                    </li>
-
-                </ul>
+                </a>
 
             </div>
-
-            <!-- LOGOUT -->
-
-            <a
-                href="{% url 'logout' %}"
-                class="btn btn-danger btn-sm"
-            >
-
-                <i class="bi bi-box-arrow-right"></i>
-                Logout
-
-    <a href="{% url 'add_log' %}">
-
-        <i class="bi bi-plus-circle-fill"></i>
-        </div>
-
-        {% endif %}
-
-        Add Log
-
-    </a>
-
-    <a href="{% url 'notifications' %}">
-
-        <i class="bi bi-bell-fill"></i>
-
-        Notifications
-
-    </a>
-
-    <a href="{% url 'profile' %}">
-
-        <i class="bi bi-person-circle"></i>
-
-        Profile
-
-    </a>
-
-    {% if request.user.is_staff %}
-
-    <a href="/admin/">
-
-        <i class="bi bi-shield-lock-fill"></i>
-
-        Admin
-
-    </a>
-
-    {% endif %}
-
-    <a href="{% url 'logout' %}">
-
-        <i class="bi bi-box-arrow-right"></i>
-
-        Logout
-
-    </a>
-
-</div>
-
-<!-- MAIN CONTENT -->
-
-<div class="main-content">
-
-    <!-- TOPBAR -->
-
-    <div class="topbar">
-
-        <div>
-
-            <h4 class="fw-bold mb-1">
-
-                Welcome back, {{ request.user.username }} 👋
-
-            </h4>
-
-            <small class="text-muted">
-
-                Track your coding journey efficiently
-
-            </small>
-
-        </div>
-
-        <div class="d-flex align-items-center gap-3">
-
-            <!-- DARK MODE -->
-
-            <button
-                class="btn btn-dark"
-                id="theme-toggle"
-            >
-
-                <i class="bi bi-moon-fill"></i>
-
-            </button>
-
-            <!-- PROFILE IMAGE -->
-
-            {% if request.user.profile.profile_picture %}
-
-                <img
-                    src="{{ request.user.profile.profile_picture.url }}"
-                    class="profile-image"
-                >
-
-            {% else %}
-
-                <img
-                    src="https://ui-avatars.com/api/?name={{ request.user.username }}"
-                    class="profile-image"
-                >
 
             {% endif %}
 
@@ -453,29 +240,37 @@
 
     </div>
 
-    <!-- MESSAGES -->
+</nav>
 
-    {% if messages %}
+<!-- AUTO HIDE MESSAGES -->
 
-        {% for message in messages %}
+{% if messages %}
 
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+<div class="message-container">
 
-                {{ message }}
+    {% for message in messages %}
 
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert"
-                ></button>
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show auto-hide-message shadow-sm">
 
-            </div>
+        {{ message }}
 
-        {% endfor %}
+        <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+        ></button>
 
-    {% endif %}
+    </div>
 
-    <!-- CONTENT -->
+    {% endfor %}
+
+</div>
+
+{% endif %}
+
+<!-- MAIN CONTENT -->
+
+<div class="container main-container">
 
     {% block content %}
 
@@ -483,39 +278,13 @@
 
 </div>
 
-<!-- JS -->
+<!-- Bootstrap JS -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- DARK MODE -->
+<!-- SCRIPTS -->
 
 <script>
-
-    const toggleBtn = document.getElementById('theme-toggle');
-
-    const body = document.getElementById('main-body');
-
-    if(localStorage.getItem('theme') === 'dark'){
-
-        body.classList.add('dark-mode');
-
-    }
-
-    toggleBtn.addEventListener('click', () => {
-
-        body.classList.toggle('dark-mode');
-
-        if(body.classList.contains('dark-mode')){
-
-            localStorage.setItem('theme','dark');
-
-        }else{
-
-            localStorage.setItem('theme','light');
-
-        }
-
-    });
 
     // AUTO HIDE ALERTS
 
@@ -534,20 +303,21 @@
     }, 3000);
 
 
-
     // LOAD NOTIFICATIONS
 
     function loadNotifications() {
+
+        const badge = document.getElementById('notification-badge');
+
+        const list = document.getElementById('notification-list');
+
+        if (!badge || !list) return;
 
         fetch('/api/notifications/recent/')
 
         .then(response => response.json())
 
         .then(data => {
-
-            const badge = document.getElementById('notification-badge');
-
-            const list = document.getElementById('notification-list');
 
             list.innerHTML = '';
 
@@ -556,9 +326,13 @@
             if(data.length === 0){
 
                 list.innerHTML = `
+
                     <li class="dropdown-item text-center text-muted">
+
                         No notifications
+
                     </li>
+
                 `;
 
             } else {
@@ -584,11 +358,18 @@
 
                                 </div>
 
+                                <small class="text-muted">
+
+                                    ${notification.created_at || ''}
+
+                                </small>
+
                             </a>
 
                         </li>
 
                     `;
+
                 });
 
             }
@@ -604,6 +385,12 @@
                 badge.style.display = 'inline-block';
 
             }
+
+        })
+
+        .catch(error => {
+
+            console.log('Notification Error:', error);
 
         });
 
