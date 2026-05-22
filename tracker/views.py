@@ -44,6 +44,8 @@ from .decorators import (
     allowed_roles
 )
 
+from django.db.models import Sum
+
 
 
 # API VIEWSET - STUDY LOG
@@ -272,24 +274,49 @@ def home(request):
 @login_required
 def dashboard(request):
 
-    logs=StudyLog.objects.filter(
+    logs = StudyLog.objects.filter(
         user=request.user
-    )
+    ).order_by('-date')
 
-    total_hours=0
+    total_hours = logs.aggregate(
+        Sum('hours')
+    )['hours__sum'] or 0
 
-    for log in logs:
-        total_hours+=log.hours
+    total_logs = logs.count()
 
-    unread_notifications_count=Notification.objects.filter(
-        user=request.user,
-        is_read=False
-    ).count()
+    avg_hours = round(
+        total_hours / total_logs,
+        2
+    ) if total_logs > 0 else 0
 
-    context={
-        'logs':logs,
-        'total_hours':total_hours,
-        'unread_notifications_count':unread_notifications_count
+    chart_labels = []
+    chart_data = []
+
+    recent_logs = logs.order_by('date')[:7]
+
+    for log in recent_logs:
+
+        chart_labels.append(
+            log.topic
+        )
+
+        chart_data.append(
+            float(log.hours)
+        )
+
+    context = {
+
+        'logs': logs,
+
+        'total_hours': total_hours,
+
+        'total_logs': total_logs,
+
+        'avg_hours': avg_hours,
+
+        'chart_labels': chart_labels,
+
+        'chart_data': chart_data
 
     }
 
@@ -298,8 +325,6 @@ def dashboard(request):
         'tracker/dashboard.html',
         context
     )
-
-
 
 # ADD LOG
 
