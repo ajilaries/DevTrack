@@ -29,6 +29,7 @@
 
         body{
             background-color: #f5f7fb;
+            
         }
 
         .message-container{
@@ -75,12 +76,53 @@
         .navbar-brand{
             letter-spacing:1px;
         }
+        body{
+            transition: background-color 0.3s ease,color 0.3s ease;
+        }
+        /* DARK MODE */
+        .dark-mode{
+            background-color: #121212 !important;
+            color: white !important;
+        }
+        .dark-mode .card{
+            background-color: #1e1e1e;
+            color: white;
 
+        }
+        .dark-mode .table{
+            color: white;
+        }
+        .dark-mode .table-dark{
+            background-color: #1e1e1e;
+        }
+        .dark-mode .navbar{
+            background-color: #000 !important;
+        }
+        .dark-mode .dropdown-menu{
+            background-color: #1e1e1e;
+            color: white;
+        }
+        .dark-mode .dropdown-item:hover{
+            background-color: #333;
+        }
+        .dark-mode .form-control{
+            background-color: #2a2a2a;
+            color: white;
+            border: 1px solid #444;
+        }
+        .dark-mode .form-control::placeholder{
+            color: #bbb;
+
+        }
+        .dark-mode .btn-outline-dark{
+            color: white;
+            border-color: white;
+        }
     </style>
 
 </head>
 
-<body>
+<body id="main-body">
 
     <!-- NAVBAR -->
 
@@ -123,6 +165,12 @@
 
                     </span>
 
+                </button>
+                <button
+                    class="btn btn-outline-light btn-sm"
+                    id="theme-toggle">
+                    <i class="bi bi-moon-fill"></i>
+                    
                 </button>
 
                 <ul
@@ -305,6 +353,28 @@
     loadNotifications();
 
     setInterval(loadNotifications, 5000);
+
+
+    const toogleBtn=document.getElementById('theme-toggle');
+
+    const body=document.getElementById('main-body');
+
+    //load saved theme
+
+    if(localStorage.getItem('theme')==='dark'){
+        body.classList.add('dark-mode');
+    }
+    //toogle theme
+    toogleBtn.addEventListener('click',()=>{
+        body.classList.toggle('dark-mode');
+
+        //save theme
+        if(body.classList.contains('dark-mode')){
+            localStorage.setItem('theme','dark');
+        }else{
+            localStorage.setItem('theme','light')
+        }
+    })
 
 </script>
 
