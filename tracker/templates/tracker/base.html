@@ -12,18 +12,23 @@
 
     <title>DevTrack</title>
 
-    <!-- Bootstrap -->
+    
+    <!-- BOOTSTRAP -->
+
     <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
     >
 
-    <!-- Bootstrap Icons -->
+    
+    <!-- ICONS -->
+
     <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     >
 
+    
     <style>
 
         *{
@@ -33,28 +38,31 @@
         }
 
         body{
-            background:#f4f7fc;
+
+            background:#f5f7fb;
+
             overflow-x:hidden;
-            font-family:Arial, sans-serif;
+
         }
 
+        
         /* SIDEBAR */
 
         .sidebar{
 
-            width:260px;
+            width:250px;
+
             height:100vh;
 
             position:fixed;
 
-            left:0;
             top:0;
 
-            background:#0f172a;
+            left:0;
 
-            padding-top:25px;
+            background:#111827;
 
-            transition:0.3s;
+            padding-top:20px;
 
             z-index:1000;
 
@@ -64,13 +72,13 @@
 
             color:white;
 
-            font-size:28px;
+            font-size:26px;
 
             font-weight:bold;
 
             text-align:center;
 
-            margin-bottom:35px;
+            margin-bottom:30px;
 
         }
 
@@ -80,11 +88,11 @@
 
             align-items:center;
 
-            gap:14px;
+            gap:12px;
 
-            color:#cbd5e1;
+            color:#d1d5db;
 
-            padding:15px 24px;
+            padding:14px 22px;
 
             text-decoration:none;
 
@@ -92,15 +100,11 @@
 
             font-weight:500;
 
-            margin:5px 12px;
-
-            border-radius:12px;
-
         }
 
         .sidebar a:hover{
 
-            background:#1e293b;
+            background:#1f2937;
 
             color:white;
 
@@ -114,25 +118,29 @@
 
         }
 
+        
         /* MAIN CONTENT */
 
         .main-content{
 
-            margin-left:260px;
+            margin-left:250px;
 
-            padding:25px;
+            padding:30px;
 
         }
 
+        
         /* TOPBAR */
 
         .topbar{
 
             background:white;
 
-            border-radius:18px;
+            padding:15px 25px;
 
-            padding:18px 25px;
+            border-radius:15px;
+
+            margin-bottom:25px;
 
             display:flex;
 
@@ -140,12 +148,11 @@
 
             align-items:center;
 
-            margin-bottom:30px;
-
-            box-shadow:0 4px 20px rgba(0,0,0,0.06);
+            box-shadow:0 4px 20px rgba(0,0,0,0.05);
 
         }
 
+        
         /* PROFILE IMAGE */
 
         .profile-image{
@@ -158,70 +165,30 @@
 
             object-fit:cover;
 
-            border:2px solid #2563eb;
-
         }
 
-        /* CARDS */
-
-        .card{
-
-            border:none;
-
-            border-radius:18px;
-
-            box-shadow:0 4px 18px rgba(0,0,0,0.05);
-
-        }
-
-        /* TABLE */
-
-        .table{
-
-            border-radius:15px;
-
-            overflow:hidden;
-
-        }
-
+        
         /* DARK MODE */
 
         .dark-mode{
 
-            background:#020617 !important;
+            background:#0f172a !important;
 
             color:white;
 
         }
 
         .dark-mode .topbar,
-        .dark-mode .card,
-        .dark-mode .table{
 
-            background:#0f172a !important;
+        .dark-mode .card{
 
-            color:white !important;
+            background:#1e293b;
 
-        }
-
-        .dark-mode .table-dark{
-
-            --bs-table-bg:#0f172a;
+            color:white;
 
         }
 
-        .dark-mode .sidebar{
-
-            background:#020617;
-
-        }
-
-        .dark-mode .text-muted{
-
-            color:#cbd5e1 !important;
-
-        }
-
+        
         /* MOBILE */
 
         @media(max-width:768px){
@@ -229,7 +196,9 @@
             .sidebar{
 
                 width:100%;
+
                 height:auto;
+
                 position:relative;
 
             }
@@ -237,14 +206,6 @@
             .main-content{
 
                 margin-left:0;
-
-            }
-
-            .topbar{
-
-                flex-direction:column;
-                gap:15px;
-                align-items:flex-start;
 
             }
 
@@ -267,6 +228,7 @@
 
 <body id="main-body">
 
+
 <!-- SIDEBAR -->
 
 <div class="sidebar">
@@ -274,7 +236,7 @@
 
     <div class="sidebar-brand">
 
-        DevTrack 🚀
+        DevTrack
 
     </div>
         <!-- LOGO -->
@@ -284,6 +246,7 @@
             <i class="bi bi-graph-up-arrow"></i>
             DevTrack
 
+    
     <a href="{% url 'dashboard' %}" class="active">
 
         <i class="bi bi-grid-fill"></i>
@@ -345,6 +308,7 @@
                 <i class="bi bi-box-arrow-right"></i>
                 Logout
 
+    
     <a href="{% url 'add_log' %}">
 
         <i class="bi bi-plus-circle-fill"></i>
@@ -356,6 +320,7 @@
 
     </a>
 
+    
     <a href="{% url 'notifications' %}">
 
         <i class="bi bi-bell-fill"></i>
@@ -364,6 +329,7 @@
 
     </a>
 
+    
     <a href="{% url 'profile' %}">
 
         <i class="bi bi-person-circle"></i>
@@ -372,8 +338,7 @@
 
     </a>
 
-    {% if request.user.is_staff %}
-
+    
     <a href="/admin/">
 
         <i class="bi bi-shield-lock-fill"></i>
@@ -382,8 +347,7 @@
 
     </a>
 
-    {% endif %}
-
+    
     <a href="{% url 'logout' %}">
 
         <i class="bi bi-box-arrow-right"></i>
@@ -394,9 +358,11 @@
 
 </div>
 
+
 <!-- MAIN CONTENT -->
 
 <div class="main-content">
+
 
     <!-- TOPBAR -->
 
@@ -404,23 +370,22 @@
 
         <div>
 
-            <h4 class="fw-bold mb-1">
+            <h5 class="fw-bold mb-0">
 
-                Welcome back, {{ request.user.username }} 👋
+                Welcome, {{ request.user.username }}
 
-            </h4>
+            </h5>
 
-            <small class="text-muted">
+        <i class="bi bi-shield-lock-fill"></i>
 
-                Track your coding journey efficiently
+        Admin
 
-            </small>
+    </a>
 
-        </div>
-
+        
         <div class="d-flex align-items-center gap-3">
 
-            <!-- DARK MODE -->
+            <!-- DARK MODE BUTTON -->
 
             <button
                 class="btn btn-dark"
@@ -431,6 +396,7 @@
 
             </button>
 
+            
             <!-- PROFILE IMAGE -->
 
             {% if request.user.profile.profile_picture %}
@@ -473,9 +439,30 @@
 
         {% endfor %}
 
+    <!-- MESSAGES -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+
+                {{ message }}
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                ></button>
+
+            </div>
+
+        {% endfor %}
+
     {% endif %}
 
-    <!-- CONTENT -->
+
+    <!-- PAGE CONTENT -->
 
     {% block content %}
 
@@ -483,25 +470,27 @@
 
 </div>
 
+
 <!-- JS -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 
 <!-- DARK MODE -->
 
 <script>
 
-    const toggleBtn = document.getElementById('theme-toggle');
+    const toggleBtn=document.getElementById('theme-toggle');
 
-    const body = document.getElementById('main-body');
+    const body=document.getElementById('main-body');
 
-    if(localStorage.getItem('theme') === 'dark'){
+    if(localStorage.getItem('theme')==='dark'){
 
         body.classList.add('dark-mode');
 
     }
 
-    toggleBtn.addEventListener('click', () => {
+    toggleBtn.addEventListener('click',()=>{
 
         body.classList.toggle('dark-mode');
 
