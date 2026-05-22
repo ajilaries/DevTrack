@@ -637,3 +637,16 @@ def mark_notification_read(request, id):
     notification.save()
 
     return redirect('notifications')
+
+@action(detail=False, methods=['GET'])
+def recent(self,request):
+    notifications=Notification.objects.filter(
+        user=request.user
+    ).order_by('-created_at')[:5]
+
+    serializer=self.get_serializer(
+        notifications,
+        many=True
+    )
+
+    return Response(serializer.data)
