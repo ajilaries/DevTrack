@@ -2,65 +2,77 @@
 
 {% block content %}
 
-<!-- TOP BAR -->
-<div class="d-flex justify-content-between align-items-center mb-4">
+<!-- DASHBOARD HEADER -->
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
 
     <div>
-        <h2 class="fw-bold">
 
-            Study Dashboard
+        <h2 class="fw-bold mb-1">
+
+            Study Dashboard 📚
 
         </h2>
 
-        <p class="text-muted">
+        <p class="text-muted mb-0">
 
-            Welcome back, {{ request.user.username }}
+            Welcome back, {{ request.user.username }} 👋
 
         </p>
+
     </div>
 
     
-    <div class="d-flex gap-2">
+    <div class="d-flex flex-wrap gap-2">
 
-        <!-- Notifications -->
+        <!-- NOTIFICATIONS -->
+
         <a
             href="{% url 'notifications' %}"
-            class="btn btn-dark position-relative"
+            class="btn btn-dark position-relative shadow-sm"
         >
 
-            🔔 Notifications
+            <i class="bi bi-bell-fill"></i>
+
+            Notifications
 
             {% if unread_notifications_count > 0 %}
 
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
 
-                {{ unread_notifications_count }}
+                    {{ unread_notifications_count }}
 
-            </span>
+                </span>
 
             {% endif %}
 
         </a>
 
         
-        <!-- Profile -->
+        <!-- PROFILE -->
+
         <a
             href="{% url 'profile' %}"
-            class="btn btn-info"
+            class="btn btn-info text-white shadow-sm"
         >
 
-            👤 Profile
+            <i class="bi bi-person-circle"></i>
+
+            Profile
 
         </a>
 
         
-        <!-- Add Log -->
+        <!-- ADD LOG -->
+
         <a
             href="{% url 'add_log' %}"
-            class="btn btn-primary"
+            class="btn btn-primary shadow-sm"
         >
 
-            + Add Log
+            <i class="bi bi-plus-circle"></i>
+
+            Add Log
 
         </a>
 
@@ -69,138 +81,265 @@
 </div>
 
 
-<!-- TOTAL HOURS CARD -->
-<div class="card shadow-lg mb-4 border-0">
+<!-- ANALYTICS CARDS -->
 
-    <div class="card-body">
+<div class="row g-4 mb-4">
 
-        <h5 class="card-title">
+    <!-- TOTAL HOURS -->
 
-            Total Study Hours
+    <div class="col-md-4">
 
-        </h5>
+        <div class="card border-0 shadow-lg h-100">
 
-        <h1 class="fw-bold text-primary">
+            <div class="card-body">
 
-            {{ total_hours }}
+                <div class="d-flex justify-content-between align-items-center">
 
-        </h1>
+                    <div>
+
+                        <h6 class="text-muted">
+
+                            Total Study Hours
+
+                        </h6>
+
+                        <h2 class="fw-bold text-primary">
+
+                            {{ total_hours }}
+
+                        </h2>
+
+                    </div>
+
+                    <i class="bi bi-clock-history display-5 text-primary"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    
+    <!-- TOTAL LOGS -->
+
+    <div class="col-md-4">
+
+        <div class="card border-0 shadow-lg h-100">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <h6 class="text-muted">
+
+                            Total Logs
+
+                        </h6>
+
+                        <h2 class="fw-bold text-success">
+
+                            {{ logs.count }}
+
+                        </h2>
+
+                    </div>
+
+                    <i class="bi bi-journal-text display-5 text-success"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    
+    <!-- STREAK -->
+
+    <div class="col-md-4">
+
+        <div class="card border-0 shadow-lg h-100">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <h6 class="text-muted">
+
+                            Study Streak
+
+                        </h6>
+
+                        <h2 class="fw-bold text-warning">
+
+                            🔥 {{ streak|default:"0" }} Days
+
+                        </h2>
+
+                    </div>
+
+                    <i class="bi bi-fire display-5 text-warning"></i>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
 </div>
 
 
-<!-- ALERT MESSAGES -->
-{% if messages %}
+<!-- STUDY LOG TABLE -->
 
-    {% for message in messages %}
+<div class="card border-0 shadow-lg">
 
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+    <div class="card-body">
 
-            {{ message }}
+        <div class="d-flex justify-content-between align-items-center mb-3">
 
-            <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert"
-            ></button>
+            <h4 class="fw-bold mb-0">
+
+                Study Logs
+
+            </h4>
 
         </div>
 
-    {% endfor %}
+        
+        <div class="table-responsive">
 
-{% endif %}
+            <table class="table table-hover align-middle">
 
+                <thead class="table-dark">
 
-<!-- TABLE -->
-<table class="table table-dark table-striped shadow align-middle">
+                    <tr>
 
-    <thead>
+                        <th>Date</th>
 
-        <tr>
+                        <th>Hours</th>
 
-            <th>Date</th>
+                        <th>Topic</th>
 
-            <th>Hours</th>
+                        <th class="text-center">
 
-            <th>Topic</th>
+                            Actions
 
-            <th>Actions</th>
+                        </th>
 
-        </tr>
+                    </tr>
 
-    </thead>
-
-    
-    <tbody>
-
-        {% for log in logs %}
-
-        <tr>
-
-            <td>
-
-                {{ log.date }}
-
-            </td>
-
-            <td>
-
-                {{ log.hours }}
-
-            </td>
-
-            <td>
-
-                {{ log.topic }}
-
-            </td>
-
-            <td class="d-flex gap-2">
-
-                <!-- EDIT -->
-                <a
-                    href="{% url 'edit_log' log.id %}"
-                    class="btn btn-warning btn-sm"
-                >
-
-                    ✏ Edit
-
-                </a>
+                </thead>
 
                 
-                <!-- DELETE -->
-                <a
-                    href="{% url 'delete_log' log.id %}"
-                    onclick="return confirm('Are you sure you want to delete this study log?')"
-                    class="btn btn-danger btn-sm"
-                >
+                <tbody>
 
-                    🗑 Delete
+                    {% for log in logs %}
 
-                </a>
+                    <tr>
 
-            </td>
+                        <td>
 
-        </tr>
+                            {{ log.date }}
 
-        {% empty %}
+                        </td>
 
-        <tr>
+                        <td>
 
-            <td colspan="4" class="text-center">
+                            <span class="badge bg-primary px-3 py-2">
 
-                No study logs found.
+                                {{ log.hours }} hrs
 
-            </td>
+                            </span>
 
-        </tr>
+                        </td>
 
-        {% endfor %}
+                        <td class="fw-semibold">
 
-    </tbody>
+                            {{ log.topic }}
 
-</table>
+                        </td>
+
+                        <td>
+
+                            <div class="d-flex justify-content-center gap-2">
+
+                                <!-- EDIT -->
+
+                                <a
+                                    href="{% url 'edit_log' log.id %}"
+                                    class="btn btn-warning btn-sm shadow-sm"
+                                >
+
+                                    <i class="bi bi-pencil-square"></i>
+
+                                </a>
+
+                                
+                                <!-- DELETE -->
+
+                                <a
+                                    href="{% url 'delete_log' log.id %}"
+                                    onclick="return confirm('Are you sure you want to delete this study log?')"
+                                    class="btn btn-danger btn-sm shadow-sm"
+                                >
+
+                                    <i class="bi bi-trash-fill"></i>
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="4" class="text-center py-5">
+
+                            <div class="d-flex flex-column align-items-center">
+
+                                <i class="bi bi-journal-x display-1 text-muted"></i>
+
+                                <h5 class="mt-3">
+
+                                    No study logs found
+
+                                </h5>
+
+                                <p class="text-muted">
+
+                                    Start tracking your coding journey 🚀
+
+                                </p>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
 
 {% endblock %}
