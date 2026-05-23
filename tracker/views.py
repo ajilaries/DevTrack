@@ -537,7 +537,10 @@ def admin_dashboard(request):
         'message': 'Welcome Admin'
     })
 
-
+#pomodoro timer
+@login_required
+def pomodoro_view(request):
+    return render(request, 'tracker/pomodoro.html')
 
 # SINGLE STUDY LOG API
 
