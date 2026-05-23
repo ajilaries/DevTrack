@@ -63,6 +63,10 @@ urlpatterns = [
         views.mark_notification_read,
         name='mark_notification_read'
     ),
+    path(
+        'pomodoro/',views.pomodoro_view, name='pomodoro'
+    ),
+    
 ]
 
 if settings.DEBUG:
