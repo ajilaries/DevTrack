@@ -99,6 +99,9 @@
 
         </a>
 
+        <!-- pomodoro -->
+         <a href="{% url 'pomodoro' %}" class="btn btn-danger">Pomodoro</a>
+
         <!-- Profile -->
 
         <a
@@ -167,7 +170,21 @@
     </div>
 
 </div>
-
+<!-- POMODORO -->
+ <div class="stats-grid">
+    <div class="stat-card">
+        <h3>Total Pomodoros</h3>
+        <p>{{total_pomodoros}}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Total Focus Minute</h3>
+        <p>{{focus_minutes}}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Total XP Earned</h3>
+        <p>{{total_xp}}</p>
+    </div>
+ </div>
 
 <!-- ALERTS -->
 

@@ -46,7 +46,11 @@ from .decorators import (
 
 from django.db.models import Sum
 
-
+# Pomodoro Storage
+from django.http import JsonResponse
+from .models import PomodoroSession
+from django.contrib.auth.decorators import login_required
+import json
 
 # API VIEWSET - STUDY LOG
 
@@ -316,9 +320,30 @@ def dashboard(request):
 
         'chart_labels': chart_labels,
 
-        'chart_data': chart_data
+        'chart_data': chart_data,
+
+        'total_pomodoros':total_pomodoros,
+        'total_xp':total_xp,
+        'focus_minutes':focus_minutes
 
     }
+
+    pomodoro_sessions=PomodoroSession.objects.filter(
+        user=request.user
+    ).order_by('-completed_at')
+
+    total_pomodoros=pomodoro_sessions.count()
+
+    total_xp=pomodoro_sessions.aggregate(
+        Sum('xp-earned')
+
+    )['xp-earned__sum'] or 0
+
+    focus_minutes=pomodoro_sessions.aggregate(
+        Sum('duration')
+
+    )['duration__sum'] or 0
+
 
     return render(
         request,
@@ -537,7 +562,10 @@ def admin_dashboard(request):
         'message': 'Welcome Admin'
     })
 
-
+#pomodoro timer
+@login_required
+def pomodoro_view(request):
+    return render(request, 'tracker/pomodoro.html')
 
 # SINGLE STUDY LOG API
 
@@ -559,7 +587,36 @@ class SingleStudyLogAPIView(
         return StudyLog.objects.filter(
             user=self.request.user
         )
+@login_required
+def save_pomodoro_session(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
 
+            duration = data.get("duration", 25)
+            mode = data.get("mode", "Focus")
+            xp = data.get("xp", 10)
+
+            PomodoroSession.objects.create(
+                user=request.user,
+                duration=duration,
+                mode=mode,
+                xp_earned=xp
+            )
+
+            return JsonResponse({
+                "status": "success"
+            })
+
+        except Exception as e:
+            return JsonResponse({
+                "status": "error",
+                "message": str(e)
+            })
+
+    return JsonResponse({
+        "status": "invalid request"
+    })
 
 
 # NOTIFICATION API VIEWSET
