@@ -74,3 +74,29 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.message
+
+# Pomodoro model
+
+class PomodoroSession(models.Model):
+
+    user=models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+    duration=models.IntegerField(
+        help_text="Duration in minutes"
+    )
+    completed_at=models.DateTimeField(
+        auto_now_add=True
+
+    )
+    mode=models.CharField(
+        max_length=20,
+        default="Focus"
+    )
+    xp_earned=models.IntegerField(
+        default=10
+    )
+
+    def __str__(self):
+        return f"{self.user.username}-{self.duration} mins"
