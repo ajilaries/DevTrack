@@ -7,80 +7,197 @@
     <div class="text-center mb-4">
 
         <h1 class="fw-bold">
-            ⏳ Pomodoro Focus Timer
+            ⏳ Pomodoro Focus Mode
         </h1>
 
         <p class="text-muted">
-            Stay focused and boost productivity
+            Deep work. Zero distractions.
         </p>
 
     </div>
 
-    <div class="card shadow-lg border-0 rounded-4 mx-auto p-5 text-center"
-         style="max-width:500px;">
 
+    <div class="card border-0 shadow-lg rounded-4 p-5 text-center mx-auto"
+         style="max-width:700px;">
+
+
+        <!-- XP -->
+        <div class="mb-3">
+
+            <span class="badge bg-warning text-dark fs-6">
+                XP: <span id="xp">0</span>
+            </span>
+
+        </div>
+
+
+        <!-- MODE -->
         <h2 id="mode-title" class="fw-bold mb-4">
 
             Focus Time
 
         </h2>
 
-        <div id="timer"
-             class="display-1 fw-bold text-primary mb-4">
 
-            25:00
+        <!-- PROGRESS RING -->
+        <div class="d-flex justify-content-center mb-4">
+
+            <svg width="220" height="220">
+
+                <circle
+                    cx="110"
+                    cy="110"
+                    r="95"
+                    stroke="#e9ecef"
+                    stroke-width="10"
+                    fill="none"
+                ></circle>
+
+                <circle
+                    id="progress-ring"
+                    cx="110"
+                    cy="110"
+                    r="95"
+                    stroke="#0d6efd"
+                    stroke-width="10"
+                    fill="none"
+                    stroke-linecap="round"
+                    transform="rotate(-90 110 110)"
+                ></circle>
+
+                <text
+                    id="timer"
+                    x="50%"
+                    y="50%"
+                    text-anchor="middle"
+                    dy=".3em"
+                    font-size="32"
+                    font-weight="bold"
+                >
+
+                    25:00
+
+                </text>
+
+            </svg>
 
         </div>
 
-        <div class="d-flex justify-content-center gap-3 mb-4">
 
-            <button class="btn btn-success px-4"
-                    onclick="startTimer()">
+        <!-- CONTROLS -->
 
+        <div class="d-flex justify-content-center gap-2 flex-wrap mb-4">
+
+            <button class="btn btn-success" onclick="startTimer()">
                 ▶ Start
-
             </button>
 
-            <button class="btn btn-warning px-4"
-                    onclick="pauseTimer()">
-
+            <button class="btn btn-warning" onclick="pauseTimer()">
                 ⏸ Pause
-
             </button>
 
-            <button class="btn btn-danger px-4"
-                    onclick="resetTimer()">
-
-                ⟳ Reset
-
+            <button class="btn btn-danger" onclick="resetTimer()">
+                ↺ Reset
             </button>
 
         </div>
 
-        <div class="d-flex justify-content-center gap-2 flex-wrap">
+
+        <!-- MODES -->
+
+        <div class="d-flex justify-content-center gap-2 flex-wrap mb-4">
 
             <button class="btn btn-outline-primary"
-                    onclick="setMode(25, 'Focus Time')">
-
+                    onclick="setMode(25,'Focus Time')">
                 Focus
+            </button>
+
+            <button class="btn btn-outline-success"
+                    onclick="setMode(5,'Short Break')">
+                Short Break
+            </button>
+
+            <button class="btn btn-outline-dark"
+                    onclick="setMode(15,'Long Break')">
+                Long Break
+            </button>
+
+        </div>
+
+
+        <!-- AMBIENT SOUND -->
+
+        <div class="mb-4">
+
+            <h5>
+                🎵 Ambient Sounds
+            </h5>
+
+            <button class="btn btn-outline-info me-2"
+                    onclick="toggleRain()">
+
+                Rain
 
             </button>
 
             <button class="btn btn-outline-success"
-                    onclick="setMode(5, 'Short Break')">
+                    onclick="toggleForest()">
 
-                Short Break
-
-            </button>
-
-            <button class="btn btn-outline-dark"
-                    onclick="setMode(15, 'Long Break')">
-
-                Long Break
+                Forest
 
             </button>
 
         </div>
+
+
+        <!-- STATS -->
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+
+                <div class="card bg-light border-0 p-3">
+
+                    <h6>Completed Sessions</h6>
+
+                    <h3 id="sessions-count">
+                        0
+                    </h3>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="card bg-light border-0 p-3">
+
+                    <h6>Today's Streak</h6>
+
+                    <h3 id="streak-count">
+                        0
+                    </h3>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="card bg-light border-0 p-3">
+
+                    <h6>Total Focus Minutes</h6>
+
+                    <h3 id="focus-minutes">
+                        0
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
 
         <div class="mt-4">
 
@@ -97,36 +214,84 @@
 
 </div>
 
-<audio id="alarm-sound">
 
-    <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"
-            type="audio/ogg">
-
+<audio id="alarm">
+    <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg">
 </audio>
+
+<audio id="rain-sound" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">
+</audio>
+
+<audio id="forest-sound" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3">
+</audio>
+
 
 <script>
 
 let timer;
-let totalSeconds = 25 * 60;
-let currentSeconds = totalSeconds;
 let running = false;
 
-function updateDisplay() {
+let totalSeconds = 1500;
+let currentSeconds = totalSeconds;
 
-    const minutes = Math.floor(currentSeconds / 60);
-    const seconds = currentSeconds % 60;
+let sessions =
+    parseInt(localStorage.getItem("sessions")) || 0;
 
-    document.getElementById('timer').innerText =
-        `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+let xp =
+    parseInt(localStorage.getItem("xp")) || 0;
+
+let streak =
+    parseInt(localStorage.getItem("streak")) || 0;
+
+let focusMinutes =
+    parseInt(localStorage.getItem("focusMinutes")) || 0;
+
+
+const radius = 95;
+const circumference = 2 * Math.PI * radius;
+
+document.getElementById("progress-ring")
+    .style.strokeDasharray = circumference;
+
+
+function updateStats(){
+
+    document.getElementById("sessions-count").innerText = sessions;
+    document.getElementById("xp").innerText = xp;
+    document.getElementById("streak-count").innerText = streak;
+    document.getElementById("focus-minutes").innerText = focusMinutes;
+
 }
 
-function startTimer() {
+
+function updateDisplay(){
+
+    let min =
+        Math.floor(currentSeconds / 60);
+
+    let sec =
+        currentSeconds % 60;
+
+    document.getElementById("timer").textContent =
+        `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+
+    const offset =
+        circumference - (currentSeconds / totalSeconds) * circumference;
+
+    document.getElementById("progress-ring")
+        .style.strokeDashoffset = offset;
+}
+
+
+function startTimer(){
 
     if(running) return;
 
     running = true;
 
-    timer = setInterval(() => {
+    timer = setInterval(()=>{
 
         if(currentSeconds > 0){
 
@@ -136,27 +301,24 @@ function startTimer() {
 
         } else {
 
-            clearInterval(timer);
-
-            running = false;
-
-            document.getElementById('alarm-sound').play();
-
-            alert("⏰ Time's up!");
+            completeSession();
 
         }
 
-    }, 1000);
+    },1000);
+
 }
 
-function pauseTimer() {
+
+function pauseTimer(){
 
     clearInterval(timer);
 
     running = false;
 }
 
-function resetTimer() {
+
+function resetTimer(){
 
     clearInterval(timer);
 
@@ -165,36 +327,101 @@ function resetTimer() {
     currentSeconds = totalSeconds;
 
     updateDisplay();
+
 }
 
-function setMode(minutes, title) {
+
+function setMode(minutes,title){
 
     totalSeconds = minutes * 60;
 
     currentSeconds = totalSeconds;
 
-    document.getElementById('mode-title').innerText = title;
+    document.getElementById("mode-title").innerText = title;
 
     resetTimer();
 }
 
-function toggleFullscreen() {
 
-    if (!document.fullscreenElement) {
+function completeSession(){
+
+    clearInterval(timer);
+
+    running = false;
+
+    sessions += 1;
+
+    streak += 1;
+
+    xp += 10;
+
+    focusMinutes += 25;
+
+    localStorage.setItem("sessions", sessions);
+    localStorage.setItem("streak", streak);
+    localStorage.setItem("xp", xp);
+    localStorage.setItem("focusMinutes", focusMinutes);
+
+    document.getElementById("alarm").play();
+
+    updateStats();
+
+    alert("🎉 Session Complete! +10 XP");
+
+    setMode(5,"Short Break");
+
+}
+
+
+function toggleFullscreen(){
+
+    if(!document.fullscreenElement){
 
         document.documentElement.requestFullscreen();
 
-    } else {
+    }else{
 
-        if (document.exitFullscreen) {
-
-            document.exitFullscreen();
-
-        }
+        document.exitFullscreen();
 
     }
+
 }
 
+
+function toggleRain(){
+
+    let rain = document.getElementById("rain-sound");
+
+    if(rain.paused){
+
+        rain.play();
+
+    }else{
+
+        rain.pause();
+
+    }
+
+}
+
+
+function toggleForest(){
+
+    let forest = document.getElementById("forest-sound");
+
+    if(forest.paused){
+
+        forest.play();
+
+    }else{
+
+        forest.pause();
+
+    }
+
+}
+
+updateStats();
 updateDisplay();
 
 </script>
