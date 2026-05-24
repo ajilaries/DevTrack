@@ -366,7 +366,32 @@ function completeSession(){
 
     updateStats();
 
-    alert("🎉 Session Complete! +10 XP");
+    fetch('/save-pomodoro-session/', {
+
+        method: 'POST',
+
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+
+        body: JSON.stringify({
+
+            duration: 25,
+            mode: 'Focus',
+            xp: 10
+
+        })
+
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        console.log("Pomodoro saved:", data);
+
+    });
+
+    alert("Session complete! +10 XP");
 
     setMode(5,"Short Break");
 
