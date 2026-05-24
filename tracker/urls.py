@@ -66,6 +66,11 @@ urlpatterns = [
     path(
         'pomodoro/',views.pomodoro_view, name='pomodoro'
     ),
+    path(
+        'save-pomodoro-session/',
+        views.save_pomodoro_session,
+        name='save_pomodoro_session'
+    )
     
 ]
 
