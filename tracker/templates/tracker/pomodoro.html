@@ -343,19 +343,23 @@ function setMode(minutes,title){
 }
 
 
-function completeSession(){
+function completeSession() {
 
     clearInterval(timer);
-
     running = false;
 
-    sessions += 1;
+    const mode =
+        document.getElementById("mode-title").innerText;
 
-    streak += 1;
+    const duration =
+        Math.floor(totalSeconds / 60);
 
-    xp += 10;
-
-    focusMinutes += 25;
+    if (mode === "Focus Time") {
+        sessions += 1;
+        streak += 1;
+        xp += 10;
+        focusMinutes += duration;
+    }
 
     localStorage.setItem("sessions", sessions);
     localStorage.setItem("streak", streak);
@@ -367,36 +371,33 @@ function completeSession(){
     updateStats();
 
     fetch('/save-pomodoro-session/', {
-
         method: 'POST',
-
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': '{{ csrf_token }}'
         },
-
         body: JSON.stringify({
-
-            duration: 25,
-            mode: 'Focus',
-            xp: 10
-
+            duration: duration,
+            mode: mode,
+            xp: mode === "Focus Time" ? 10 : 0
         })
-
     })
     .then(response => response.json())
     .then(data => {
-
         console.log("Pomodoro saved:", data);
-
+    })
+    .catch(error => {
+        console.error("Error saving session:", error);
     });
 
-    alert("Session complete! +10 XP");
-
-    setMode(5,"Short Break");
-
+    if (mode === "Focus Time") {
+        alert("Session complete! +10 XP");
+        setMode(5, "Short Break");
+    } else {
+        alert("Break finished!");
+        setMode(25, "Focus Time");
+    }
 }
-
 
 function toggleFullscreen(){
 
