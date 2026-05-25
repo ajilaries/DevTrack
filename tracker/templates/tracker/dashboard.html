@@ -185,7 +185,40 @@
         <p>{{total_xp}}</p>
     </div>
  </div>
+<div class="card-mb-4">
+    <div class="card shadow border-0 rounded-4 p-4 text-center">
+        <h5>Level</h5>
 
+        <h2>
+            {{profile.level}}
+        </h2>
+        <p>
+            {{profile.xp}} XP
+        </p>
+        <!-- <div class="progress">
+            <div class="progress-bar bg-warning"
+            style="width: {{profile.xp|divisibleby:100}}%;"
+            ></div>
+        </div> -->
+    </div>
+</div>
+
+
+<!-- BADGE -->
+
+<div class="card shadow border-0 rounded-4 p-4 mt-4">
+    <h4>Achievement Badges</h4>
+
+    {% if profile.badges %}
+        {% for badge in profile.badges %}
+            <span class="badge bg-warning text-dark me-2 p-2">
+                {{badge}}
+            </span>
+            {% endfor %}
+        {% else %}
+        <p>No badges unlocked yet</p>
+        {% endif %}
+</div>
 <!-- ALERTS -->
 
 {% if messages %}
