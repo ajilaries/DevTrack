@@ -323,10 +323,17 @@ def dashboard(request):
         'chart_data': chart_data,
 
         'total_pomodoros':total_pomodoros,
+
         'total_xp':total_xp,
-        'focus_minutes':focus_minutes
+
+        'focus_minutes':focus_minutes,
+
+        'profile':profile,
 
     }
+    profile=Profile.objects.get_or_create(
+        user=request.user
+    )[0]
 
     pomodoro_sessions=PomodoroSession.objects.filter(
         user=request.user
@@ -603,9 +610,18 @@ def save_pomodoro_session(request):
                 mode=mode,
                 xp_earned=xp
             )
+            profile=Profile.objects.get(user=request.user)
+
+            profile.xp +=xp
+            profile.update_level()
+            profile.check_badges()
+
 
             return JsonResponse({
-                "status": "success"
+                "status": "success",
+                "xp":profile.xp,
+                "level":profile.level
+                
             })
 
         except Exception as e:
