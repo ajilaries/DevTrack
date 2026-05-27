@@ -22,7 +22,14 @@ class Profile(models.Model):
     )
 
     bio=models.TextField(
-        blank=True
+        blank=True,
+        null=True
+    )
+
+    avatar=models.ImageField(
+        upload_to='avatars/',
+        blank=True,
+        null=True
     )
 
     profile_picture=models.ImageField(
@@ -48,9 +55,19 @@ class Profile(models.Model):
         choices=ROLE_CHOICES,
         default='student'
     )
-    xp=models.IntegerField(default=0)
-    level=models.IntegerField(default=1)
-    badges=models.JSONField(default=list, blank=True)
+    xp=models.IntegerField(
+        default=0
+    )
+    level=models.IntegerField(
+        default=1
+    )
+    badges=models.JSONField(
+        default=list,
+        blank=True
+    )
+    # joined_on=models.DateTimeField(
+    #     auto_now=True
+    # )
 
     def update_level(self):
         self.level=(self.xp//100)+1
