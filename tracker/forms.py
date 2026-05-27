@@ -93,6 +93,8 @@ class ProfileForm(forms.ModelForm):
         fields=[
             'bio',
             'avatar',
+            'daily_goal',
+            'weekly_goal',
             'profile_picture',
             'github',
             'linkedin'
