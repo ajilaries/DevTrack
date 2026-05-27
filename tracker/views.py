@@ -44,6 +44,10 @@ from .decorators import (
     allowed_roles
 )
 
+from datetime import timedelta
+from django.utils.timezone import now
+from django.utils import timezone
+
 from django.db.models import Sum
 
 # Pomodoro Storage
@@ -304,6 +308,31 @@ def dashboard(request):
         Sum('hours')
     )['hours_sum'] or 0
 
+    daily_hours=StudyLog.objects.filter(
+        user=request.user,
+        date=today
+    ).aggregate(
+        Sum('hours')
+    )['hours_sum'] or 0
+
+    weekly_hours=StudyLog.objects.filter(
+        user=request.user,
+        date_gte=week_ago
+    ).aaggregate(
+        Sum('hours')
+    )['hours_sum']or 0
+
+    daily_progress=min(
+        (daily_hours/ profile.daily_goal)*100,
+        100
+    )if profile.daily_goal else 0
+
+    weekly_progress=min(
+        (weekly_hours/ profile.weekly_goal) *100,
+        100
+    )if profile.weekly_goal else 0
+
+
     total_logs=logs.count()
 
     avg_hours=round(
@@ -324,6 +353,10 @@ def dashboard(request):
         'total_hours':total_hours,
         'total_logs':total_logs,
         'avg_hours':avg_hours,
+        'daily_hours':daily_hours,
+        'weekly_hours':weekly_hours,
+        'daily_progress':daily_progress,
+        'weekly_progress':daily_progress,
         'chart_labels':char_labels,
         'chart_data':chart_data,
         'total_pomodoros':total_pomodoros,
@@ -332,6 +365,9 @@ def dashboard(request):
         'profile':profile,
     }
 
+    today=timezone.now().date()
+
+    week_ago =today- timedelta(days=7)
     return render(
         request,
         'tracker/dashboard.html',
@@ -344,6 +380,31 @@ def dashboard(request):
 def add_log(request):
 
     if request.method == "POST":
+
+        profile, created=Profile.objects.get_or_create(
+            user=request.user
+        )
+
+        today=now().data()
+
+        if profile.last_study_date:
+            if profile.last_study_date==today:
+                pass
+
+            elif profile.last_study_date==today - timedelta(days=1):
+                profile.current_streak+=1
+
+            else:
+                profile.current_streak=1
+        else:
+            profile.current_streak=1
+
+        profile.last_study_date=today
+
+        if profile.current_streak> profile.best_streak:
+            profile.best_streak=profile.current_streak
+        
+        profile.save()
 
         form = StudyLogForm(request.POST)
 

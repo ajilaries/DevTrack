@@ -65,6 +65,25 @@ class Profile(models.Model):
         default=list,
         blank=True
     )
+    current_streak=models.IntegerField(
+        default=0
+    )
+
+    best_streak=models.IntegerField(
+        default=0
+
+    )
+    last_study_date=models.DateField(
+        null=True,
+        blank=True
+    )
+
+    daily_goal=models.FloatField(
+        default=2
+    )
+    weekly_goal=models.FloatField(
+        default=10
+    )
     # joined_on=models.DateTimeField(
     #     auto_now=True
     # )
