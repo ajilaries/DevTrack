@@ -44,6 +44,9 @@ from .decorators import (
     allowed_roles
 )
 
+from datetime import timedelta
+from django.utils.timezone import now
+
 from django.db.models import Sum
 
 # Pomodoro Storage
@@ -344,6 +347,31 @@ def dashboard(request):
 def add_log(request):
 
     if request.method == "POST":
+
+        profile, created=Profile.objects.get_or_create(
+            user=request.user
+        )
+
+        today=now().data()
+
+        if profile.last_study_date:
+            if profile.last_study_date==today:
+                pass
+
+            elif profile.last_study_date==today - timedelta(days=1):
+                profile.current_streak+=1
+
+            else:
+                profile.current_streak=1
+        else:
+            profile.current_streak=1
+
+        profile.last_study_date=today
+
+        if profile.current_streak> profile.best_streak:
+            profile.best_streak=profile.current_streak
+        
+        profile.save()
 
         form = StudyLogForm(request.POST)
 
