@@ -296,8 +296,8 @@ def dashboard(request):
     total_pomodoros=pomodoro_sessions.count()
 
     total_xp=pomodoro_sessions.aggregate(
-        Sum('xp_earned')
-    )['xp_earned_sum'] or 0
+        total=Sum('xp_earned')
+    )['total'] or 0
 
     focus_minutes=pomodoro_sessions.aggregate(
         Sum('duration')
