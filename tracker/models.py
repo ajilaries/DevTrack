@@ -77,6 +77,13 @@ class Profile(models.Model):
         null=True,
         blank=True
     )
+
+    daily_goal=models.FloatField(
+        default=2
+    )
+    weekly_goal=models.FloatField(
+        default=10
+    )
     # joined_on=models.DateTimeField(
     #     auto_now=True
     # )
