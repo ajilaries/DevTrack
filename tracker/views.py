@@ -281,99 +281,96 @@ def home(request):
 
 @login_required
 def dashboard(request):
-    logs=StudyLog.objects.filter(
+    today = timezone.now().date()
+    week_ago = today - timedelta(days=7)
+
+    logs = StudyLog.objects.filter(
         user=request.user
     ).order_by('-date')
 
-    profile, created=Profile.objects.get_or_create(
+    profile, created = Profile.objects.get_or_create(
         user=request.user
     )
 
-    pomodoro_sessions=PomodoroSession.objects.filter(
+    pomodoro_sessions = PomodoroSession.objects.filter(
         user=request.user
     ).order_by('-completed_at')
 
-    total_pomodoros=pomodoro_sessions.count()
+    total_pomodoros = pomodoro_sessions.count()
 
-    total_xp=pomodoro_sessions.aggregate(
+    total_xp = pomodoro_sessions.aggregate(
         total=Sum('xp_earned')
     )['total'] or 0
 
-    focus_minutes=pomodoro_sessions.aggregate(
-    total=Sum('duration')
-
+    focus_minutes = pomodoro_sessions.aggregate(
+        total=Sum('duration')
     )['total'] or 0
 
-    total_hours=logs.aggregate(
-    total=Sum('hours')
+    total_hours = logs.aggregate(
+        total=Sum('hours')
     )['total'] or 0
 
-    daily_hours=StudyLog.objects.filter(
+    daily_hours = StudyLog.objects.filter(
         user=request.user,
         date=today
     ).aggregate(
         total=Sum('hours')
     )['total'] or 0
 
-    weekly_hours=StudyLog.objects.filter(
+    weekly_hours = StudyLog.objects.filter(
         user=request.user,
-        date_gte=week_ago
-    ).aaggregate(
+        date__gte=week_ago
+    ).aggregate(
         total=Sum('hours')
-    )['total']or 0
+    )['total'] or 0
 
-    daily_progress=min(
-        (daily_hours/ profile.daily_goal)*100,
+    daily_progress = min(
+        (daily_hours / profile.daily_goal) * 100,
         100
-    )if profile.daily_goal else 0
+    ) if profile.daily_goal else 0
 
-    weekly_progress=min(
-        (weekly_hours/ profile.weekly_goal) *100,
+    weekly_progress = min(
+        (weekly_hours / profile.weekly_goal) * 100,
         100
-    )if profile.weekly_goal else 0
+    ) if profile.weekly_goal else 0
 
+    total_logs = logs.count()
 
-    total_logs=logs.count()
+    avg_hours = round(
+        total_hours / total_logs, 2
+    ) if total_logs > 0 else 0
 
-    avg_hours=round(
-        total_hours/total_logs, 2
-    )if total_logs> 0 else 0
+    chart_labels = []
+    chart_data = []
 
-    char_labels=[]
-    chart_data=[]
-    recent_logs=logs.order_by('date')[:7]
-
+    recent_logs = logs.order_by('date')[:7]
 
     for log in recent_logs:
-        char_labels.append(log.topic)
+        chart_labels.append(log.topic)
         chart_data.append(float(log.hours))
 
-    context={
-        'logs':logs,
-        'total_hours':total_hours,
-        'total_logs':total_logs,
-        'avg_hours':avg_hours,
-        'daily_hours':daily_hours,
-        'weekly_hours':weekly_hours,
-        'daily_progress':daily_progress,
-        'weekly_progress':daily_progress,
-        'chart_labels':char_labels,
-        'chart_data':chart_data,
-        'total_pomodoros':total_pomodoros,
-        'total_xp':total_xp,
-        'focus_minutes':focus_minutes,
-        'profile':profile,
+    context = {
+        'logs': logs,
+        'total_hours': total_hours,
+        'total_logs': total_logs,
+        'avg_hours': avg_hours,
+        'daily_hours': daily_hours,
+        'weekly_hours': weekly_hours,
+        'daily_progress': daily_progress,
+        'weekly_progress': weekly_progress,
+        'chart_labels': chart_labels,
+        'chart_data': chart_data,
+        'total_pomodoros': total_pomodoros,
+        'total_xp': total_xp,
+        'focus_minutes': focus_minutes,
+        'profile': profile,
     }
 
-    today=timezone.now().date()
-
-    week_ago =today- timedelta(days=7)
     return render(
         request,
         'tracker/dashboard.html',
         context
     )
-
 # ADD LOG
 
 @login_required
