@@ -277,73 +277,60 @@ def home(request):
 
 @login_required
 def dashboard(request):
-
-    logs = StudyLog.objects.filter(
+    logs=StudyLog.objects.filter(
         user=request.user
     ).order_by('-date')
 
-    total_hours = logs.aggregate(
-        Sum('hours')
-    )['hours__sum'] or 0
-
-    total_logs = logs.count()
-
-    avg_hours = round(
-        total_hours / total_logs,
-        2
-    ) if total_logs > 0 else 0
-
-    chart_labels = []
-    chart_data = []
-
-    recent_logs = logs.order_by('date')[:7]
-
-    for log in recent_logs:
-
-        chart_labels.append(
-            log.topic
-        )
-
-        chart_data.append(
-            float(log.hours)
-        )
-
-    context = {
-
-        'logs': logs,
-
-        'total_hours': total_hours,
-
-        'total_logs': total_logs,
-
-        'avg_hours': avg_hours,
-
-        'chart_labels': chart_labels,
-
-        'chart_data': chart_data,
-
-        'total_pomodoros':total_pomodoros,
-        'total_xp':total_xp,
-        'focus_minutes':focus_minutes
-
-    }
+    profile, created=Profile.objects.get_or_create(
+        user=request.user
+    )
 
     pomodoro_sessions=PomodoroSession.objects.filter(
         user=request.user
-    ).order_by('-completed_at')
+    ).order_by('-created_at')
 
     total_pomodoros=pomodoro_sessions.count()
 
     total_xp=pomodoro_sessions.aggregate(
-        Sum('xp-earned')
-
-    )['xp-earned__sum'] or 0
+        Sum('xp_earned')
+    )['xp_earned_sum'] or 0
 
     focus_minutes=pomodoro_sessions.aggregate(
         Sum('duration')
 
-    )['duration__sum'] or 0
+    )['duration_sum'] or 0
 
+    total_hours=logs.aggregate(
+        Sum('hours')
+    )['hours_sum'] or 0
+
+    total_logs=logs.count()
+
+    avg_hours=round(
+        total_hours/total_logs, 2
+    )if total_logs> 0 else 0
+
+    char_labels=[]
+    chart_data=[]
+    recent_logs=logs.order_by('date')[:7]
+
+
+    for log in recent_logs:
+        char_labels.append(log.topic)
+        chart_data.append(float(log.hours))
+
+    context={
+        'logs':logs,
+        'total_hours':total_hours,
+        'total_logs':total_logs,
+        'avg_hours':avg_hours,
+        'chart_labels':char_labels,
+        'chart_data':chart_data,
+        'total_pomodoros':total_pomodoros,
+        'total_xp':total_xp,
+        'focus_minutes':focus_minutes,
+        'profile':profile,
+    }
 
     return render(
         request,
@@ -488,12 +475,22 @@ def profile_view(request):
         user=request.user
     )
 
+    xp_for_next_level=profile.level*100
+
+    progress_percent=(
+        profile.xp/xp_for_next_level
+    )*100 if xp_for_next_level else 0
+
+    context={
+        'profile':profile,
+        'progress_percent':progress_percent,
+        'xp_for_next_level':xp_for_next_level
+    }
+
     return render(
         request,
         'tracker/profile.html',
-        {
-            'profile':profile
-        }
+        context
     )
 
 @login_required
@@ -603,9 +600,18 @@ def save_pomodoro_session(request):
                 mode=mode,
                 xp_earned=xp
             )
+            profile=Profile.objects.get(user=request.user)
+
+            profile.xp +=xp
+            profile.update_level()
+            profile.check_badges()
+
 
             return JsonResponse({
-                "status": "success"
+                "status": "success",
+                "xp":profile.xp,
+                "level":profile.level
+                
             })
 
         except Exception as e:

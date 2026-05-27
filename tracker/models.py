@@ -22,7 +22,14 @@ class Profile(models.Model):
     )
 
     bio=models.TextField(
-        blank=True
+        blank=True,
+        null=True
+    )
+
+    avatar=models.ImageField(
+        upload_to='avatars/',
+        blank=True,
+        null=True
     )
 
     profile_picture=models.ImageField(
@@ -48,9 +55,43 @@ class Profile(models.Model):
         choices=ROLE_CHOICES,
         default='student'
     )
+    xp=models.IntegerField(
+        default=0
+    )
+    level=models.IntegerField(
+        default=1
+    )
+    badges=models.JSONField(
+        default=list,
+        blank=True
+    )
+    # joined_on=models.DateTimeField(
+    #     auto_now=True
+    # )
+
+    def update_level(self):
+        self.level=(self.xp//100)+1
+        self.save()
 
     def __str__(self):
         return self.user.username
+    
+    def check_badges(self):
+        badges=self.badges or []
+
+        if self.xp>= 100  and "Beginner" not in badges:
+            badges.append("Beginner")
+        
+        if self.xp>=500 and "Focused Learner" not in badges:
+            badges.append("Focused Learner")
+        
+        if self.xp>=1000 and "Study Master" not in badges:
+            badges.append("Study Master")
+
+        self.badges=badges
+        self.save()
+
+        
     
 class Notification(models.Model):
 
