@@ -291,7 +291,7 @@ def dashboard(request):
 
     pomodoro_sessions=PomodoroSession.objects.filter(
         user=request.user
-    ).order_by('-created_at')
+    ).order_by('-completed_at')
 
     total_pomodoros=pomodoro_sessions.count()
 
