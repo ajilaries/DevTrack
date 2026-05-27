@@ -300,27 +300,27 @@ def dashboard(request):
     )['total'] or 0
 
     focus_minutes=pomodoro_sessions.aggregate(
-        Sum('duration')
+    total=Sum('duration')
 
-    )['duration_sum'] or 0
+    )['total'] or 0
 
     total_hours=logs.aggregate(
-        Sum('hours')
-    )['hours_sum'] or 0
+    total=Sum('hours')
+    )['total'] or 0
 
     daily_hours=StudyLog.objects.filter(
         user=request.user,
         date=today
     ).aggregate(
-        Sum('hours')
-    )['hours_sum'] or 0
+        total=Sum('hours')
+    )['total'] or 0
 
     weekly_hours=StudyLog.objects.filter(
         user=request.user,
         date_gte=week_ago
     ).aaggregate(
-        Sum('hours')
-    )['hours_sum']or 0
+        total=Sum('hours')
+    )['total']or 0
 
     daily_progress=min(
         (daily_hours/ profile.daily_goal)*100,
