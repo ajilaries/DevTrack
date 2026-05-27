@@ -1,67 +1,149 @@
 {% extends 'tracker/base.html' %}
-
 {% block content %}
 
-<div class="container mt-5">
+<div class="container py-5">
 
-    <div class="card shadow p-4">
+    <div class="card shadow-lg border-0 rounded-4 p-5 mx-auto"
+         style="max-width: 760px;">
 
-        <div class="text-center">
+        <!-- PROFILE HEADER -->
 
-            <img
-                src="{{ profile.profile_picture.url }}"
-                width="140"
-                height="140"
-                class="rounded-circle shadow mb-3"
-                style="object-fit: cover;"
-            >
+        <div class="text-center mb-4">
 
-            <h2>
+            {% if profile.avatar %}
+                <img
+                    src="{{ profile.avatar.url }}"
+                    class="rounded-circle shadow"
+                    width="120"
+                    height="120"
+                    style="object-fit: cover;"
+                >
+            {% else %}
+                <div
+                    class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mx-auto shadow"
+                    style="width:120px;height:120px;font-size:40px;"
+                >
+                    👤
+                </div>
+            {% endif %}
+
+            <h2 class="mt-3 fw-bold">
                 {{ request.user.username }}
             </h2>
 
             <p class="text-muted">
-                {{ request.user.email }}
+                {{ profile.bio|default:"No bio added yet." }}
             </p>
+
+            <a href="{% url 'edit_profile' %}"
+               class="btn btn-primary rounded-pill px-4 mt-2">
+                Edit Profile
+            </a>
 
         </div>
 
         <hr>
 
-        <div class="mt-3">
 
-            <h5>Profile Details</h5>
+        <!-- XP LEVEL -->
 
-            <p>
-                <strong>Bio:</strong>
-                {{ profile.bio }}
-            </p>
+        <div class="mb-4">
 
-            <p>
-                <strong>College:</strong>
-                {{ profile.college }}
-            </p>
+            <div class="d-flex justify-content-between mb-2">
 
-            <p>
-                <strong>Course:</strong>
-                {{ profile.course }}
-            </p>
+                <h5 class="mb-0">
+                    ⭐ Level {{ profile.level }}
+                </h5>
+
+                <span class="fw-semibold">
+                    {{ profile.xp }} / {{ xp_for_next_level }} XP
+                </span>
+
+            </div>
+
+            <div class="progress rounded-pill"
+                 style="height:14px;">
+
+                <div
+                    id="xpBar"
+                    class="progress-bar bg-warning progress-bar-striped progress-bar-animated rounded-pill"
+                    role="progressbar"
+                    aria-valuenow="{{ progress_percent }}"
+                    aria-valuemin="0"
+                    aria-valuemax="100">
+                </div>
+
+            </div>
 
         </div>
 
-        <div class="mt-4">
 
-            <a
-                href="{% url 'edit_profile' %}"
-                class="btn btn-primary"
-            >
-                Edit Profile
-            </a>
+        <!-- STATS -->
+
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-4">
+                <div class="card border-0 bg-dark text-white text-center shadow-sm rounded-4 p-3">
+                    <h3>{{ total_pomodoros }}</h3>
+                    <small>Total Pomodoros</small>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-0 bg-primary text-white text-center shadow-sm rounded-4 p-3">
+                    <h3>{{ focus_minutes }}</h3>
+                    <small>Focus Minutes</small>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-0 bg-success text-white text-center shadow-sm rounded-4 p-3">
+                    <h3>{{ profile.xp }}</h3>
+                    <small>Total XP</small>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- BADGES -->
+
+        <div>
+
+            <h5 class="mb-3">
+                🏅 Achievement Badges
+            </h5>
+
+            {% if profile.badges %}
+
+                {% for badge in profile.badges %}
+
+                    <span class="badge rounded-pill bg-warning text-dark px-3 py-2 me-2 mb-2 fs-6 shadow-sm">
+                        {{ badge }}
+                    </span>
+
+                {% endfor %}
+
+            {% else %}
+
+                <p class="text-muted">
+                    No badges unlocked yet.
+                </p>
+
+            {% endif %}
 
         </div>
 
     </div>
 
 </div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const bar = document.getElementById("xpBar");
+    bar.style.width = "{{ progress_percent }}%";
+});
+</script>
 
 {% endblock %}
