@@ -3,6 +3,7 @@
 DevTrack is a Django-based study tracking and productivity web application built for learning backend engineering concepts using Python and Django.
 
 The project focuses heavily on:
+
 - Authentication systems
 - Session management
 - ORM relationships
@@ -16,6 +17,7 @@ The project focuses heavily on:
 # Features
 
 ## Authentication System
+
 - User Signup
 - User Login
 - Secure Password Hashing
@@ -23,6 +25,7 @@ The project focuses heavily on:
 - Logout System
 
 ## Study Tracking
+
 - Add study logs
 - Edit study logs
 - Delete study logs
@@ -30,6 +33,7 @@ The project focuses heavily on:
 - Add notes and topics
 
 ## Authorization & Security
+
 - Login protected routes
 - User ownership validation
 - Secure CRUD operations
@@ -37,6 +41,7 @@ The project focuses heavily on:
 - Password validation
 
 ## Backend Concepts Practiced
+
 - Django ORM
 - Aggregations
 - Query filtering
@@ -50,14 +55,17 @@ The project focuses heavily on:
 # Tech Stack
 
 ## Backend
+
 - Python
 - Django
 
 ## Frontend
+
 - HTML
 - Bootstrap 5
 
 ## Database
+
 - SQLite3
 
 ---
@@ -88,7 +96,7 @@ devtrack/
 
 # ⚙️ Installation
 
-##  Clone Repository
+## Clone Repository
 
 ```bash
 git clone https://github.com/ajilaries/DevTrack.git
@@ -130,19 +138,22 @@ source venv/bin/activate
 
 ## Install Dependencies
 
+Install all dependencies from `requirements.txt`:
+
 ```bash
-pip install django
+pip install -r requirements.txt
 ```
 
 ---
 
-## Run Migrations
+## Run Migrations (SQLite)
 
 ```bash
 python manage.py makemigrations
-
 python manage.py migrate
 ```
+
+This uses SQLite at `db.sqlite3` (configured in `config/settings.py`).
 
 ---
 
@@ -159,6 +170,12 @@ python manage.py runserver
 ```text
 http://127.0.0.1:8000/
 ```
+
+---
+
+# Live Demo (PythonAnywhere)
+
+https://aries001.pythonanywhere.com/
 
 ---
 
@@ -199,6 +216,6 @@ Developed by Ajil as part of backend engineering and Django learning journey.
 
 ---
 
-#  Project Goal
+# Project Goal
 
 The main goal of DevTrack is to practice real-world backend development concepts while building a scalable Django application from scratch.
