@@ -56,6 +56,12 @@ from .models import PomodoroSession
 from django.contrib.auth.decorators import login_required
 import json
 
+
+# AI INTEGRATION
+from django.http import JsonResponse
+import json
+from .app.services.task_ai import generate_subtasks
+
 # API VIEWSET - STUDY LOG
 
 class StudyLogViewSet(viewsets.ModelViewSet):
@@ -796,3 +802,33 @@ def recent(self,request):
     )
 
     return Response(serializer.data)
+
+
+def break_task(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        task = data.get("task")
+
+        if not task:
+            return JsonResponse({"error": "Task required"}, status=400)
+
+        subtasks = generate_subtasks(task)
+
+        return JsonResponse({
+            "task": task,
+            "subtasks": subtasks
+        })
+    
+def ai_task_helper(request):
+    subtasks = []
+
+    if request.method == "POST":
+        task = request.POST.get("task")
+        if task:
+            subtasks = generate_subtasks(task)
+
+    return render(
+        request,
+        "tracker/ai_helper.html",
+        {"subtasks": subtasks}
+    )
